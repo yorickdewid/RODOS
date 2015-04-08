@@ -1,0 +1,38 @@
+
+
+
+if [ "$1" == "" -o "$1" == "maskgenerator"  ] ; then
+   cd maskgenerator
+   doit
+   cd ..
+   done="maskgenerator"
+fi 
+
+
+if [ "$1" == "" -o "$1" == "guiserver"  ] ; then
+   cd server-qt-freedrawing
+   doit
+   cd ..
+
+   cd server-qt-user-specific-example
+   doit
+   cd ..
+
+   cd server-xlib-freedrawing
+   doit
+   cd ..
+
+
+   done="qt"
+fi
+
+if [ "$1" == "" -o "$1" == "guiserveropengl"  ] ; then
+   cd server-opengl
+   doit
+   cd ..
+   done="opengl"
+fi
+
+if [ "$done" == "" ] ; then
+   echo ERROR! parameter not defined
+fi

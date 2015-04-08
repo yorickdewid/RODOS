@@ -1,0 +1,70 @@
+
+                               LEON GRMON Primer
+                    ----------------------------------------
+
+
+--[ 1  - Prequisites
+
+In order to compile Rodos for leon processors it is recommended to use gaislers
+bcc toolchain. Precompiled versions can be found at:
+
+    http://gaisler.com/anonftp/bcc/bin/
+
+Note that as of spring 2013, Leon2 support has been dropped and you need the
+legacy version. On Archlinux you may simply install the 'bcc' AUR package.
+
+For tests with any leon hardware you want to use the gaisler debug monitor
+called grmon. You can download grmon from the gaisler website at:
+
+    http://gaisler.com/anonftp/grmon/
+
+On Archlinux you may simply install the 'grmon-eval' package from the AUR.
+
+
+--[ 2  - GRMON
+
+In most cases the evaluation version will be sufficient. The dependencies
+include: ncurses, libftdi, libusb-compat, libusbx and nspr. On a 64-bit system
+make sure you have a 32-bit ncurses version installed.
+
+Grmon connects over the DSU uart and it is recommended to have it initialize
+the stack pointer on startup with a value compatible with your system. An
+example to startup grmon is provided below:
+
+    $ grmon -uart /dev/ttyUSB1 -stack 0x40ffffff
+
+Make sure you have correct permissions on your device nodes. On many systems
+this can be as simple as adding yourself to the 'uucp' group.
+
+    $ sudo gpasswd -a <user> uucp
+
+When started, grmon provides a command line interface that allows you to load
+ELF and binary files to memory, set the program counter and run it. This is
+done by issuing the following commands:
+
+    > load /path/to/your/image.elf
+    > run
+
+You may interrupt the system manually with ^CTRL+c and resume it with the
+'continue' command. There are a lot of options for debugging purposes like
+breakpoints, instruction and AHB trace buffers (...). You may view review
+all commands by issuing the 'help' line.
+
+You may communicate with your hardware via uart. The first UART is initialized
+on every BSP as the debug uart where regular printf messages are sent. For this
+you can use 'picocom' or 'minicom' but you can also directly use linux command
+line tools to accomplish this. First setup your terminal line settings:
+
+    $ stty -F /dev/ttyUSB0 115200
+    $ stty -F /dev/ttyUSB0 -echo ignbrk
+
+You can review all settings in human readable form:
+
+    $ stty -F /dev/ttyUSB0 -a
+
+In order to write or read to and from the uart it can go as simple as this:
+
+    $ echo -en "data" > /dev/ttyUSB0
+    $ while true; do cat -v < /dev/ttyUSB0; done
+
+

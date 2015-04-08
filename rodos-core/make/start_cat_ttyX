@@ -1,0 +1,27 @@
+# !/bin/bash
+
+#start_serial_terminal()
+#{
+echo "Enter interface (ttyS0,ttyUSB0,...)[ttyS0]:"
+read INTERFACE
+if [ ! -n "$INTERFACE" ]; then
+    INTERFACE="ttyS0"
+#    echo $INTERFACE
+fi
+
+echo "Enter baudrate (9600,19200,...)[115200]:"
+read BAUDRATE 
+if [ ! -n "$BAUDRATE" ]; then
+    BAUDRATE="115200"
+#    echo $BAUDRATE
+fi
+
+
+/bin/stty -F /dev/$INTERFACE $BAUDRATE
+/bin/stty -F /dev/$INTERFACE raw
+/bin/cat /dev/$INTERFACE
+#}
+
+#export -f start_serial_terminal
+
+#/usr/bin/xterm -e start_serial_terminal

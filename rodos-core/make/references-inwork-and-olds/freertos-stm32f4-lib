@@ -1,0 +1,35 @@
+#! /bin/bash
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi
+
+source ${RODOS_MAKES}/freertos-stm32f4-set-vars
+
+cd ${RODOS_LIBS}
+
+# compile hw-dependent files
+#echo "we are now in `pwd`"
+for FRTOS_SRC in ${SOURCES}
+do
+    echo $FRTOS_SRC
+    if ls ${FRTOS_SRC}/*.c  >& /dev/null ; then
+        ${C_COMP} ${CFLAGS} ${INCLUDES} ${FRTOS_SRC}/*.c -c
+    fi
+    
+    if ls ${FRTOS_SRC}/*.S  >& /dev/null ; then
+        ${C_COMP} ${CFLAGS} ${INCLUDES} ${FRTOS_SRC}/*.S -c
+    fi
+    
+    if ls ${FRTOS_SRC}/*.s  >& /dev/null ; then
+        ${C_COMP} ${CFLAGS} ${INCLUDES} ${FRTOS_SRC}/*.s -c
+    fi
+done
+
+${C_COMP} ${CFLAGS} ${INCLUDES} ${MY_SRCS}/FreeRTOS/Source/portable/MemMang/heap_3.c -c
+
+# compile RODOS hw-independent files
+source ${RODOS_MAKES}/generic-lib
+
+cd ${RODOS_ROOT}
+

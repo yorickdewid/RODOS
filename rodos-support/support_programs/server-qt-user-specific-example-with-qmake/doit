@@ -1,0 +1,9 @@
+
+qmake -project
+qmake
+make
+
+rm *.o *.pro Makefile
+
+mv server-qt-user-specific-example-with-qmake tst
+

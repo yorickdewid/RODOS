@@ -1,0 +1,19 @@
+
+if [ ! -d ${RODOS_SUPPORT_LIBS} ]; then
+echo "****************************************************"
+echo "*** Warning: Can not build support-libs"
+echo "*** support-libs directory missing"
+#echo "*** Directory ${RODOS_SUPPORT_LIBS} does not exist."
+echo "****************************************************"
+exit;
+fi
+
+
+if [ ! -e ${RODOS_SUPPORT_LIBS}/doit-${ARCH} ]; then
+echo "****************************************************"
+echo "*** Warning: Can not build support-libs"
+echo "*** build script \"doit-${ARCH}\" missing"
+echo "****************************************************"
+exit;
+fi
+

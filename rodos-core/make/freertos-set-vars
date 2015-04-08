@@ -1,0 +1,55 @@
+
+###############################################################################
+#
+# FreeRTOS comes along with a number of ports. The port to be used has to
+# be specified separately. The corresponding files are located as follows:
+#
+# rodos
+#  |- api
+#  |- src
+#     |- on-freertos       - Wrapper for FreeRTOS kernel: ${ARCH}
+#        |- FreeRTOS       - FreeRTOS kernel 
+#           |- include     - FreeRTOS kernel includes
+#           |- portable
+#              |- MemMang  - varies possibly with the architecture
+#              |- Posix - architecture dependend ports: ${SUB_ARCH}
+#              |- PC    - Platform dependend ports    : ${SUB_PLATFORM}
+#
+################################################################################
+#!/bin/sh
+ARCH=freertos
+SUB_ARCH=Posix
+#SUB_ARCH=avr32_uc3
+
+# MY_HW_SRCS and MY_SRCS are also used in script "generic-lib" called from "freertos-lib"
+# - "generic-lib" compiles all cpp files of MY_SRCS
+# - "generic-lib" compiles all cpp and assembler files of MY_HW_SRCS
+MY_SRCS="${RODOS_ROOT}/src/on-freertos"
+MY_HW_SRCS="${RODOS_ROOT}/src/on-freertos"
+
+LIB_INCLUDES=" \
+-I ${MY_SRCS}/FreeRTOS/Source/include \
+-I ${MY_SRCS}/FreeRTOS/Source \
+-I ${MY_SRCS}/FreeRTOS/Source/portable/MemMang/ \
+-I ${MY_SRCS}/FreeRTOS/Source/portable/${SUB_ARCH} \
+-I ${MY_SRCS}/FreeRTOS/Demo/Common/include"     # for serial.h
+
+LIB_SRCS=" \
+${MY_SRCS}/FreeRTOS/Source \
+${MY_SRCS}/FreeRTOS/Source/portable/MemMang \
+${MY_SRCS}/FreeRTOS/Source/portable/${SUB_ARCH}"
+#${MY_SRCS}/FreeRTOS/Demo/${SUB_PLATFORM}"
+
+# Print path for debugging
+#echo "LIB_SRCS = ${LIB_SRCS}"
+
+INCLUDES=" -I ${RODOS_API} -I ${MY_SRCS} ${LIB_INCLUDES} -I${RODOS_SUPPORT_LIBS} ${APP_INCLUDES}"
+
+CFLAGS=" -g -m32 -Wall -Wno-long-long -O0 -fno-exceptions -mfpmath=387 -dH"
+CPPFLAGS=" "
+
+FIRST_LINK_OBJ=" ${RODOS_LIBS}/${ARCH}/00globalobjects.o "
+LINKFLAGS=" -L  ${RODOS_LIBS}/${ARCH} ${APP_LIBS} -lrodos -lrt -lpthread -lm"
+
+CPP_COMP="g++"
+CC="gcc"

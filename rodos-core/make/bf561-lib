@@ -1,0 +1,11 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+echo "sorry...."
+echo " port is ready, but we do not have the correspongis cripts now"
+echo
+echo
+
+

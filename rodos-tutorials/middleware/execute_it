@@ -1,0 +1,7 @@
+
+#plase try only som senders and only some receivers
+
+linux-executable demo_topics.cpp  sender*cpp receiver*
+
+tst
+

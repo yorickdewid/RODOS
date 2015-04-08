@@ -1,0 +1,80 @@
+#! /bin/bash
+
+ARCH=stm32f4
+
+if [ -z $SUB_ARCH ] ; then
+  #SUB_ARCH=stm32f429 # STM32F429Discovery
+  #SUB_ARCH=stm32f427
+  SUB_ARCH=stm32f40x  # STM32F4Discovery, MINI-M4
+fi
+
+if [ -z $OSC_CLK ] ; then
+  OSC_CLK=8000000     # STM32F4Discovery, STM32F429Discovery
+  #OSC_CLK=16000000   # MINI-M4
+  #OSC_CLK=24000000   # PX4FLOW
+fi
+
+export RODOS_SRC1="${RODOS_ROOT}/src/bare-metal-generic"
+export RODOS_SRC2="${RODOS_ROOT}/src/independent"
+export RODOS_SRC3="${RODOS_ROOT}/src/independent/gateway"
+
+export RODOS_ARCH_SRC1="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+export RODOS_ARCH_SRC2="${RODOS_ROOT}/src/bare-metal/${ARCH}/CMSIS/Include"
+export RODOS_ARCH_SRC3="${RODOS_ROOT}/src/bare-metal/${ARCH}/hal"
+export RODOS_ARCH_SRC4="${RODOS_ROOT}/src/bare-metal/${ARCH}/CMSIS/Device/ST/STM32F4xx/Include"
+export RODOS_ARCH_SRC5="${RODOS_ROOT}/src/bare-metal/${ARCH}/STM32F4xx_StdPeriph_Driver/inc"
+export RODOS_ARCH_SRC6="${RODOS_ROOT}/src/bare-metal/${ARCH}/sdCard"
+
+export INCLUDES=" \
+     ${USERCONFIGDIR} \
+    -I. \
+    -I${RODOS_API} \
+    -I${RODOS_SRC1} \
+    -I${RODOS_SRC2} \
+    -I${RODOS_SRC3} \
+    -I${RODOS_ARCH_SRC1} \
+    -I${RODOS_ARCH_SRC2} \
+    -I${RODOS_ARCH_SRC3} \
+    -I${RODOS_ARCH_SRC4} \
+    -I${RODOS_ARCH_SRC5} \
+    -I${RODOS_ARCH_SRC6} \
+    -I${RODOS_SUPPORT_LIBS} \
+    ${APP_INCLUDES} \
+    -I${RODOS_ROOT}/default_usr_configs"
+
+# compiler flags for STM32F4-Discovery (STM32F407)
+if [ ${SUB_ARCH} = stm32f40x ]; then
+	echo "STM32F40x selected"
+	export CFLAGS_BASICS="-Wno-long-long -O0 -Wall -Wno-format -g3 -gdwarf-2 -DSTM32F40_41xxx -DHSE_VALUE=${OSC_CLK} -DUSE_STM32_DISCOVERY -DUSE_STDPERIPH_DRIVER"
+	export HWCFLAGS=" -mcpu=cortex-m4 -mthumb -mfloat-abi=softfp -mfpu=fpv4-sp-d16"
+	export LINKFLAGS=" -T${RODOS_ARCH_SRC1}/scripts/stm32_flash.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -L${RODOS_LIBS}/${ARCH} ${APP_LIBS} -fno-unwind-tables -fno-asynchronous-unwind-tables -lrodos -lm"
+elif [ ${SUB_ARCH} = stm32f429 ]; then 
+	# compiler flags for STM32F429I-DISCO (STM32F429)
+	echo "STM32F429 selected"
+	export CFLAGS_BASICS="-Wno-long-long -O0 -Wall -Wno-format -g3 -gdwarf-2 -DSTM32F429_439xx -DHSE_VALUE=${OSC_CLK} -DUSE_STM32F429I_DISCO -DUSE_STDPERIPH_DRIVER"
+	export HWCFLAGS=" -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16"
+	export LINKFLAGS=" -T${RODOS_ARCH_SRC1}/scripts/stm32f429_flash.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -L${RODOS_LIBS}/${ARCH} ${APP_LIBS} -fno-unwind-tables -fno-asynchronous-unwind-tables -lrodos -lm"
+elif [ ${SUB_ARCH} = stm32f427 ]; then 
+	# compiler flags for STM32F427ZI
+	echo "STM32F427 selected"
+	export CFLAGS_BASICS="-Wno-long-long -O0 -Wall -Wno-format -g3 -gdwarf-2 -DSTM32F427_437xx -DHSE_VALUE=${OSC_CLK} -DUSE_STDPERIPH_DRIVER"
+	export HWCFLAGS=" -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16"
+	export LINKFLAGS=" -T${RODOS_ARCH_SRC1}/scripts/stm32f427zi_flash.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -L${RODOS_LIBS}/${ARCH} ${APP_LIBS} -fno-unwind-tables -fno-asynchronous-unwind-tables -lrodos -lm"
+else
+	echo "SUB_ARCH not specified in make/stm32f4-set-vars"
+	exit 1
+fi
+
+export CFLAGS=" ${CFLAGS_BASICS} ${HWCFLAGS} "
+
+export CPPFLAGS="-fno-rtti -fno-exceptions "
+
+export ARM_TOOLS="/opt/arm-tools/bin"
+
+export CPP_COMP="${ARM_TOOLS}/arm-none-eabi-g++ "
+export C_COMP="${ARM_TOOLS}/arm-none-eabi-gcc "
+export AR="${ARM_TOOLS}/arm-none-eabi-ar "
+
+
+
+

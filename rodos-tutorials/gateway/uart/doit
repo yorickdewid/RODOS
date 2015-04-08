@@ -1,0 +1,13 @@
+#!/bin/sh
+
+GATEWAY=gateway-forward-all.cpp
+
+linux-lib
+leon3nexys3-lib
+
+leon3nexys3-executable ${GATEWAY} demo_topics.cpp sender.cpp
+mv tst tst-send
+
+linux-executable ${GATEWAY} demo_topics.cpp receiver.cpp
+mv tst tst-recv
+

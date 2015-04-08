@@ -1,0 +1,20 @@
+
+
+linux-executable  gateway.cpp clearscreen.cpp demo_topics.cpp sender1*
+mv tst tst-sender
+xterm -bg white  -fg black -title senders -e tst-sender &
+
+
+linux-executable gateway.cpp clearscreen.cpp  demo_topics.cpp receiver*
+mv tst tst-receiver-all
+xterm -bg white  -fg black -title receivers -e tst-receiver-all &
+
+linux-executable gateway.cpp clearscreen.cpp  demo_topics.cpp receiver11.cpp
+mv tst tst-receiver-11
+xterm -bg white  -fg black -title receivers11 -e tst-receiver-11 &
+
+linux-executable gateway.cpp clearscreen.cpp  demo_topics.cpp receiver15.cpp
+mv tst tst-receiver-15
+xterm -bg white  -fg black -title receivers15 -e tst-receiver-15 &
+
+

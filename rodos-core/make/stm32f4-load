@@ -1,0 +1,86 @@
+#! /bin/bash
+
+if [ -z $RODOS_ROOT ]; then
+    source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/stm32f4-set-vars
+
+FLASH_TOOL=openocd
+FLASH_TOOL_PATH=/usr/bin
+OBJCOPY=arm-none-eabi-objcopy
+OBJCOPY_PATH=$ARM_TOOLS
+
+if [ -x ${FLASH_TOOL_PATH}/${FLASH_TOOL} ]; then
+	echo "${FLASH_TOOL}: installed"
+    FLASH_TOOL=${FLASH_TOOL_PATH}/${FLASH_TOOL}
+else
+	# look for flash tool in default path
+	command -v ${FLASH_TOOL} >/dev/null 2>&1 || { echo "${FLASH_TOOL}: NOT installed" >&2; exit 1; }
+	echo "${FLASH_TOOL}: installed "
+    FLASH_TOOL="$(command -v ${FLASH_TOOL})"
+fi
+
+
+if [ -x $OBJCOPY_PATH/$OBJCOPY ]; then
+	echo "$OBJCOPY: installed"
+    OBJCOPY=${OBJCOPY_PATH}/${OBJCOPY}
+else
+	# look for objcopy in default path
+	command -v ${OBJCOPY} >/dev/null 2>&1 || { echo "${OBJCOPY}: NOT installed" >&2; exit 1; }
+	echo "${OBJCOPY}: installed"
+	OBJCOPY="$(command -v ${OBJCOPY})"
+fi
+
+
+if [ -f ./${ARCH}.elf ]; then
+	echo "${ARCH}.elf: OK"
+	if [ -f ./*.hex ]; then
+		echo "deleting existing ihex-file ..."
+		rm *.hex
+	fi
+	echo "creating new ihex-file ..."
+	$OBJCOPY -O ihex ${ARCH}.elf ${ARCH}.hex
+else
+	echo "${ARCH}.elf: FAIL"
+	if [ -f ./${ARCH}.hex ]; then
+		echo "${ARCH}.hex: OK"
+	else
+		echo "${ARCH}.hex: FAIL"
+		exit 1;
+	fi
+#	exit 1;
+fi
+
+
+#if [ -f ./${ARCH}.hex ]; then
+#	echo "${ARCH}.hex: OK"
+#else
+#	echo "${ARCH}.hex: FAIL"
+#	exit 1;
+#fi
+
+
+
+if [ ! -f /etc/udev/rules.d/49-stlinkv1.rules -o ! -f /etc/udev/rules.d/49-stlinkv2.rules ] 
+then
+	echo "superuser password needed to access USB-Port"
+
+	# mount rule for stlink1
+    echo "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"0483\", ATTRS{idProduct}==\"3744\", MODE:=\"0666\", SYMLINK+=\"stlinkv1_%n\"" > 49-stlinkv1.rules
+
+	# mount rule for stlink2
+    echo "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"0483\", ATTRS{idProduct}==\"3748\", MODE:=\"0666\", SYMLINK+=\"stlinkv2_%n\"" > 49-stlinkv2.rules
+
+	sudo mv 49-stlinkv1.rules /etc/udev/rules.d/
+	sudo mv 49-stlinkv2.rules /etc/udev/rules.d/
+
+	sudo udevadm trigger 
+	sudo udevadm control --reload-rules
+
+	sleep 1s 
+fi
+
+
+echo "flashing ..."
+${FLASH_TOOL} -f ${RODOS_ROOT}/src/bare-metal/${ARCH}/scripts/openocd_flash.cfg

@@ -1,0 +1,6 @@
+#make clean
+#make
+
+g++ -o tst  -Wall    Defos-server.cpp Visualisation/*.cpp Importer/*.cpp     -lm -lGL -lGLU -lglut
+	
+

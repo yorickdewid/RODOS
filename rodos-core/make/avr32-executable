@@ -1,0 +1,22 @@
+#! /bin/bash
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/avr32-set-vars
+
+\rm -f *.d
+\rm -f *.o
+
+###### compile and link executable file ######
+#${C_COMP}  ${CFLAGS}             ${INCLUDES} -c  *.c 
+#${CPP_COMP} ${CFLAGS} ${CPPFLAGS} ${INCLUDES} -c  *.cpp
+${CPP_COMP} ${CFLAGS} ${CPPFLAGS} ${INCLUDES} -c $* 
+${CPP_COMP} ${HWCFLAGS} -o avr32.elf *.o ${LINKFLAGS} 
+
+###### create hex file for programming uC-flash ######
+${AVR_TOOLS}/avr32-objcopy -O ihex avr32.elf avr32.hex
+rm -f *.o
+
+

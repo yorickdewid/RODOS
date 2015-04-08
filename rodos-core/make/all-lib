@@ -1,0 +1,30 @@
+rodos-clear
+echo "----------------------------------------- arm-lib"
+arm-lib
+echo "----------------------------------------- avr32-lib"
+avr32-lib
+echo "----------------------------------------- cortex-lib"
+echo "RODOS-warning: this cortext has no rodos namespace"
+echo "RODOS-warning: too many other warnings, sent to dev/null"
+cortex-lib >& /dev/null
+echo "----------------------------------------- freertos-lib"
+freertos-lib
+echo "----------------------------------------- leon2spwrtc-lib"
+leon2spwrtc-lib
+echo "----------------------------------------- leon3ut699-lib"
+leon3ut699-lib
+echo "----------------------------------------- linux-lib"
+linux-lib
+echo "----------------------------------------- posix-lib"
+posix-lib
+echo "----------------------------------------- ppc405-qemu-lib"
+ppc405-qemu-lib
+echo "----------------------------------------- sparc64-lib"
+sparc64-lib
+echo "----------------------------------------- stm32-lib"
+stm32-lib
+echo "----------------------------------------- stm32f4-lib"
+stm32f4-lib
+echo "----------------------------------------- tiny-linux-lib"
+tiny-linux-lib
+

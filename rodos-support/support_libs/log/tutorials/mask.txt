@@ -1,0 +1,10 @@
+*** See support_programs/maskgen to generate mask.h****
+
+ ┌─────────────────────────────────────────────┐
+ │ Logging framework example with MaskAppender │
+ ├─────────────────────────────────────────────┤
+ │ Time since boot:                [ TIME ] s  │
+ │ Battery voltage:                [ BATV ] mV │
+ │ Battery current:                [ BATC ] mA │
+ └─────────────────────────────────────────────┘
+

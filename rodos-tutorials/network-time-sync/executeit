@@ -1,0 +1,19 @@
+
+cd server
+linux-executable ../gateway.cc clearscreen.cc ../topics.cc ts_server.cc
+xterm -bg white -fg black -title "TimeSync Server" -e tst &
+cd ..
+echo "server running, wait 3 seconds to start each client"
+sleep 3
+
+cd client
+linux-executable ../gateway.cc clearscreen.cc ../topics.cc ts_client.cc
+xterm -bg white -fg black -title "TimeSync Client [1]" -e tst &
+
+sleep 3
+xterm -bg white -fg black -title "TimeSync Client [2]" -e tst &
+
+sleep 3
+xterm -bg white -fg black -title "TimeSync Client [3]" -e tst &
+
+

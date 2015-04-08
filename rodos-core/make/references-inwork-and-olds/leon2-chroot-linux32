@@ -1,0 +1,18 @@
+#! /bin/bash 
+
+#set -euC
+
+MYDIR_RAW="`dirname \"$0\"`"
+MYBASE="`basename \"$0\"`"
+MYDIR_ABS="`cd \"$MYDIR_RAW\" && pwd`"
+MYPATH_ABS="$MYDIR_ABS/$MYBASE"
+
+if test "${RUN-0}" = 0
+then
+  export RUN=1
+  export CURDIR="`pwd`"
+  dchroot -d -c linux -- $MYPATH_ABS "$@"
+else
+  cd ${CURDIR-.}
+  "$@"
+fi

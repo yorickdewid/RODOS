@@ -1,0 +1,25 @@
+
+###################
+
+
+## !!
+## Verwendeter Compiler: Sourcery CodeBench Lite Edition for ARM GNU/Linux
+## !!
+
+
+ARCH=linux-makecontext
+MY_SRCS="${RODOS_ROOT}/src/bare-metal-generic"
+MY_HW_SRCS="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+
+INCLUDES=" -I${RODOS_API}  -I${MY_SRCS} -I${MY_HW_SRCS} -I${RODOS_SUPPORT_LIBS} ${APP_INCLUDES}"
+
+CFLAGS=" -g -Wall -pedantic -Wno-long-long -fno-exceptions "
+CPPFLAGS="-std=gnu++0x "
+
+FIRST_LINK_OBJ=" ${RODOS_LIBS}/${ARCH}/00globalobjects.o "
+LINKFLAGS=" -L  ${RODOS_LIBS}/${ARCH}  ${APP_LIBS} -lrodos -lm -lrt "
+
+#CPP_COMP="g++ "
+CPP_COMP="arm-none-linux-gnueabi-g++ "
+
+

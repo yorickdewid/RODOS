@@ -1,0 +1,45 @@
+How to use HAL_CAN on linux:
+
+1. Load the main kernel module:
+
+sudo modprobe can
+
+2a. Load the driver module for your CAN hardware
+
+sudo modprobe <module_name>
+
+To get help how to configure it (e.g. bitrate, timings) type
+
+sudo ip link set vcan0 type can help
+
+or 2b. Create Virtual can interface:
+
+sudo modprobe vcan
+sudo ip link add type vcan
+sudo ip link set up vcan0
+
+3. Use HAL_CAN in RODOS as usual
+For Mapping of CAN_IDX to interfacenames names see bare-metal/linuxx86/hal/hal_can.cpp
+
+5.
+To monitor CAN frames on the bus or on a virtual interface you can use wireshark(GUI) or candump from can-utils(console)
+
+for e.g.:
+candump vcan0
+
+To send you can use cansend from can-utils
+
+cansend vcan0 000004d2#0011aabb
+
+will send a CAN frame with extende ID of 0x42D and 4 bytes of data : 0x00 0x11 0xAA 0xBB
+
+
+
+
+You must download and compile can-utils youself:
+
+svn checkout svn://svn.berlios.de/socketcan/trunk
+cd trunk/can-utils/
+make
+sudo make install
+

@@ -1,0 +1,57 @@
+#! /bin/bash 
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+echo "RODOS-warning: this cortext has no rodos namespace"
+
+source ${RODOS_MAKES}/cortex-vars-envs
+
+#### clean target dir
+cd ${RODOS_LIBS}
+
+\rm -rf ${ARCH}
+mkdir   ${ARCH}
+
+\rm -f *.o
+\rm -f *.d
+
+
+##########################################################
+
+${CPP_COMP} ${CPPFLAGS} ${INCLUDES}  ${RODOS_ROOT}/src/independent/*.cpp  -c
+${CPP_COMP} ${CPPFLAGS} ${INCLUDES}  ${RODOS_ROOT}/src/independent/gateway/*.cpp  -c
+${CPP_COMP} ${CPPFLAGS} ${INCLUDES}  ${MY_SRCS}/*.cpp  -c
+
+#${CPP_COMP} ${CPPFLAGS} ${INCLUDES}  ${RODOS_SUPPORT_LIBS}/*.cpp  -c
+
+${CPP_COMP} ${CPPFLAGS} ${INCLUDES}  ${MY_HW_SRCS}/*.cpp -c
+${C_COMP}   ${CFLAGS}   ${INCLUDES}  ${MY_HW_SRCS}/*.c -c
+
+
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/src/*.c -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/src/cpu.S -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/utils/*.c -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/utils/gdb.S -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/sd_fatfs/src/*.c -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/sd_fatfs/port/*.c -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/udp_lwip/port/*.c -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/udp_lwip/src/core/*.c -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/udp_lwip/src/core/ipv4/*.c -c
+${C_COMP} ${CFLAGS}  ${INCLUDES}  ${MY_HW_SRCS}/udp_lwip/src/netif/*.c -c
+
+ar rc librodos.a *.o
+mv librodos.a ${ARCH}
+\rm -f *.o
+\rm -f *.d
+
+source ${RODOS_MAKES}/check_rodos_support
+
+cd ${RODOS_ROOT}
+
+echo
+echo "---------End of lib------------"
+
+
+

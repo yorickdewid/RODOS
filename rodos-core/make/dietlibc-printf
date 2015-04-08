@@ -1,0 +1,15 @@
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+cd ${RODOS_ROOT}/src/independent/printf
+
+${C_COMP} ${CFLAGS} -c -nostdinc -I . -I${DIETLIBC}/include *.c
+
+ar rc libprintf.a *.o
+mv libprintf.a ${RODOS_LIBS}/${ARCH}
+\rm -f *.o
+
+cd ${RODOS_ROOT}
+
+

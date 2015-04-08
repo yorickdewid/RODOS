@@ -1,0 +1,18 @@
+
+###################
+
+
+ARCH=posix
+MY_SRCS="${RODOS_ROOT}/src/on-posix"
+MY_HW_SRCS=""
+
+INCLUDES=" ${USERCONFIGDIR} -I${RODOS_API} -I${MY_SRCS} -I${MY_SRCS}/hal -I${RODOS_SUPPORT_LIBS}  ${APP_INCLUDES} -I${RODOS_ROOT}/default_usr_configs"
+
+CFLAGS=" -g -m32 -Wall -pedantic -Wno-long-long -Wno-cpp -O2 -fno-exceptions -mfpmath=387 "
+CPPFLAGS="  -std=gnu++0x  "
+
+FIRST_LINK_OBJ=" ${RODOS_LIBS}/${ARCH}/00globalobjects.o "
+LINKFLAGS=" -L  ${RODOS_LIBS}/${ARCH} ${APP_LIBS}  -lrodos -lm -lrt -lpthread "
+CPP_COMP="g++ "
+
+

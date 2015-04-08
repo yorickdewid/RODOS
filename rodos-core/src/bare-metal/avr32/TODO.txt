@@ -1,0 +1,11 @@
+- finish HAL UART
+- finish HAL ADC
+- finish HAL PWM
+- HAL I2C
+- HAL SPI
+- HAL Ethernet
+	
+optional:
+	- SDRAM initialization -> 8MB additional main memory (Micron MT48LC16M16A2 -> 8MB)
+	- xprintf over LCD
+	- DAC -> is only an audio dac; no external filter on EVK1100; pins are available at ext. header

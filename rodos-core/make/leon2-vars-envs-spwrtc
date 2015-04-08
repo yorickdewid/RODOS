@@ -1,0 +1,68 @@
+#! /bin/bash 
+
+# Copyright: DLR
+# Author:    Henrik Theiling, AbsInt Angewandte Informatik GmbH
+# Adapted from linux and arm versions.
+
+# Include with source, otherwise setting variables has no effect.
+
+export ARCH=leon
+
+## Directory structure:
+export RODOS_SRC1="${RODOS_ROOT}/src/independent"
+export RODOS_SRC2="${RODOS_ROOT}/src/bare-metal-generic"
+export RODOS_PRINTF_SRC="${RODOS_ROOT}/src/independent/printf"
+export RODOS_ARCH_SRC="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+export RODOS_ARCH_SRC_SUB="${RODOS_ROOT}/src/bare-metal/${ARCH}/leon2-spwrtc"
+export RODOS_ARCH_DST="${RODOS_LIBS}/${ARCH}"
+
+## Compiler settings:
+export RODOS_GCC_PREFIX="sparc-elf"
+export RODOS_GCC_PREFIX_="sparc-elf-"
+
+export RODOS_GCC_BIN="`dirname \"${RODOS_GCC_PREFIX}\"`"
+
+PATH="${RODOS_GCC_BIN}:${PATH}"
+
+#export HARDWARE="-DHW_CONFIG_SPWRTC"
+export HARDWARE=""
+
+export CXXFLAGS_ONLY=" -fno-rtti -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables "
+export CFLAGS_BASICS=" -fno-exceptions -W -Wall -Wextra -Wno-unused-parameter -Wundef -Os -D NO_RODOS_NAMESPACE"
+export HWCFLAGS=" ${HARDWARE} -nostartfiles -nodefaultlibs -nostdlib \
+                  -mcpu=v8 -mfpu \
+                  -mapp-regs -fcall-used-g6 -fcall-used-g7 \
+                  -frename-registers "
+
+export OS_COMPONENTS="src src/printf hw_dependent/${ARCH}"
+# What will go into librodos.a.
+# generic.make will gather all .c, .cpp, .s, and .S files from these directories.
+
+export INCLUDES=" -isystem ${RODOS_ARCH_SRC}/fake_std \
+	-I${RODOS_ARCH_SRC_SUB} \
+	-I${RODOS_ARCH_SRC} \
+	-I${RODOS_SRC1} \
+	-I${RODOS_SRC2} \
+	-I${RODOS_API}  \
+	-I${RODOS_SUPPORT_LIBS} \
+	${APP_INCLUDES} "
+# HT: Include order changed because of redundant (and probably
+#     wrong) hw_specific.h file in src/.  The copy for ARM is
+#     different.  The copy for LEON2 is thought to be the most
+#     generic and correct one, so we want to find it before
+#     anything else.
+
+export CFLAGS=" ${CFLAGS_BASICS} ${HWCFLAGS} "
+export CXXFLAGS=" ${CFLAGS} ${CXXFLAGS_ONLY} "
+
+export LINKFLAGS=" -Wl,--script=${RODOS_LIBS}/${ARCH}/linkerscript.l -L ${RODOS_LIBS}/${ARCH} ${APP_LIBS} -lrodos -lm -lgcc "
+export LINKFLAGS_SIM=" -Wl,--script=${RODOS_LIBS}/${ARCH}/linkerscript-sim.l -L ${RODOS_LIBS}/${ARCH} -lrodos -lm -lgcc "
+
+export CPP_COMP="${RODOS_GCC_PREFIX_}g++"
+export C_COMP="${RODOS_GCC_PREFIX_}gcc"
+export AR_EXE="${RODOS_GCC_PREFIX_}ar"
+export RANLIB_EXE="${RODOS_GCC_PREFIX_}ranlib"
+export OBJCOPY_EXE="${RODOS_GCC_PREFIX_}objcopy"
+export OBJDUMP_EXE="${RODOS_GCC_PREFIX_}objdump"
+export MKPROM_EXE="${RODOS_GCC_BIN}/../mkprom2/mkprom2"
+

@@ -1,0 +1,10 @@
+
+
+build_supportprograms
+
+xterm -e  ${RODOS_SUPPORT_PROGS}/server-qt-user-specific-example/tst &
+sleep 2
+
+linux-executable  user-defined-gui.cpp
+tst
+

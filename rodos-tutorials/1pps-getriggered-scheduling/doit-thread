@@ -1,0 +1,8 @@
+linux-executable scheduler_1pps_getriggert.cpp  example-threads-1pps.cpp
+
+echo "DONE, to test please"
+echo "      in one term start tst"
+echo "      in other term type killall tst"
+echo "      or execute the script generate-1pps.sh"
+echo
+

@@ -1,0 +1,19 @@
+#!/bin/bash
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi
+
+source ${RODOS_MAKES}/console_colors
+
+echo $GREEN_BOLD"Load bin file to iMX6 via u-Boot. Procedure:"
+echo $BLUE_BOLD"  - In U-Boot verify the loadaddr variable using 'printenv' "
+echo $BLUE_BOLD"  - If not set to 0x10000000 - do 'setenv loadaddr 0x10000000' and save it with 'saveenv'"
+echo $RED_BOLD"    If linux is to be used via the SD card set this variable to 0x10800000 "
+echo $BLUE_BOLD"  - Using kermit, prepare U-Boot to receive a binary file using 'loadb'"
+echo $BLUE_BOLD"  - Switch to the command line in the host using 'ctrl + \ + c'"
+echo $BLUE_BOLD"  - Go to the path where is the bin file to download to the board"
+echo $BLUE_BOLD"  - Download the file using 'send path/file.bin'"
+echo $BLUE_BOLD"  - Connect to the board again, using 'c'"
+echo $BLUE_BOLD"  - Verify the size of the file and the load address"
+echo $BLUE_BOLD"  - Run the image, using 'go 10000000'"
+echo $GREEN_BOLD"Good programming."$RESET

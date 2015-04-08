@@ -1,0 +1,11 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+echo "first install  libc6-dev-i386 "
+echo "sudo apt-get install libc6-dev-i386"
+echo "sudo apt-get install build-essential"
+echo "then use linux-*, wich include -m32 for compiler flags"
+
+

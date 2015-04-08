@@ -1,0 +1,51 @@
+#! /bin/bash
+
+ARCH=freertos
+SUB_ARCH=CORTEX_M4F_STM32F407ZG-SK
+
+export MY_SRCS="${RODOS_ROOT}/src/on-freertos"
+
+export INCLUDES=" \
+    -I. \
+    -I${RODOS_API} \
+    -I${MY_SRCS} \
+    ${LIB_INCLUDES} \
+    ${APP_INCLUDES} \
+    \
+    -I${MY_SRCS}/FreeRTOS/Source/include \
+    -I${MY_SRCS}/FreeRTOS/Source/portable/MemMang/ \
+    -I${MY_SRCS}/FreeRTOS/Source/portable/GCC/ARM_CM4F \
+    -I${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH} \
+    -I${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH}/board \
+    -I${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH}/Libraries/CMSIS/Device/ST/STM32F4xx/Include \
+    -I${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH}/Libraries/CMSIS/Include \
+    -I${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH}/Libraries/STM32F4xx_StdPeriph_Driver/inc \
+    -I${MY_SRCS}/FreeRTOS/Demo/Common/include"
+
+export SOURCES=" \
+    ${MY_SRCS}/FreeRTOS/Source \
+    ${MY_SRCS}/FreeRTOS/Source/portable/GCC/ARM_CM4F \
+    ${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH} \
+    ${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH}/board \
+    ${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH}/Libraries/STM32F4xx_StdPeriph_Driver/src \
+    ${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH}/startup \
+    ${MY_SRCS}/"
+
+#echo "RODOS-warning: this stm32f4 has no namespace RODOS"
+export CFLAGS_BASICS=" -Wno-long-long -O0 -Wall -g3 -DSTM32F4 -DUSE_STM32_DISCOVERY -DHSE_VALUE=8000000 -DUSE_STDPERIPH_DRIVER"
+export HWCFLAGS=" -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard"
+export CFLAGS=" ${CFLAGS_BASICS} ${HWCFLAGS} "
+#export CPPFLAGS="-fno-rtti -fno-exceptions -D NO_RODOS_NAMESPACE"
+export CPPFLAGS="-fno-rtti -fno-exceptions "
+
+export FIRST_LINK_OBJ=" ${RODOS_LIBS}/${ARCH}/00globalobjects.o "
+export LINKFLAGS=" -T${MY_SRCS}/FreeRTOS/Demo/${SUB_ARCH}/config/stm32_flash.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -L${RODOS_LIBS}/${ARCH} -fno-unwind-tables -fno-asynchronous-unwind-tables -lrodos"
+
+export ARM_TOOLS="/opt/arm-tools/bin"
+
+export CPP_COMP="${ARM_TOOLS}/arm-none-eabi-g++ "
+export C_COMP="${ARM_TOOLS}/arm-none-eabi-gcc "
+
+
+
+

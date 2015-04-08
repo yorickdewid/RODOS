@@ -1,0 +1,21 @@
+
+ /**** Generated with support_programms/maskgen ***/
+
+#define NR  "\x1B[1;10H"
+#define LD  "\x1B[2;10H"
+#define ROTX     "\x1B[4;24H"
+#define SX  "\x1B[4;34H"
+#define ROTY     "\x1B[10;47H"
+#define SY  "\x1B[10;57H"
+#define ROTZ     "\x1B[15;16H"
+#define SZ  "\x1B[15;27H"
+#define L0  "\x1B[19;12H"
+#define L1  "\x1B[19;17H"
+#define L2  "\x1B[19;22H"
+#define L3  "\x1B[19;27H"
+#define L4  "\x1B[19;32H"
+#define L5  "\x1B[19;37H"
+#define L6  "\x1B[19;42H"
+#define L7  "\x1B[19;47H"
+#define L8  "\x1B[19;52H"
+#define L9  "\x1B[19;57H"

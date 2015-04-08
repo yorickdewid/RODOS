@@ -1,0 +1,9 @@
+
+
+echo "rodos root: " $RODOS_ROOT
+echo "       api: " $RODOS_API
+echo "      libs: " $RODOS_LIBS
+
+
+
+

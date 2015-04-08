@@ -1,0 +1,11 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+echo "WANING: not suppoerted any more, try ppc405-qemu-lib"
+
+#source ${RODOS_MAKES}/ppc405-vars-envs
+#source ${RODOS_MAKES}/ppc405-generic-lib
+
+

@@ -1,0 +1,11 @@
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/rodos/!svn/ver/189/trunk/tutorials/advanced_and_complex/development-tests/stm32-gyro-i2c/.openocd
+END
+openocd.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/rodos/!svn/ver/189/trunk/tutorials/advanced_and_complex/development-tests/stm32-gyro-i2c/.openocd/openocd.cfg
+END

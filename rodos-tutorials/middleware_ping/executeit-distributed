@@ -1,0 +1,10 @@
+
+linux-executable  mytopics.cpp pong.cpp
+xterm -bg white  -fg black -title pongReceivers -e tst &
+
+sleep 2
+
+linux-executable  mytopics.cpp ping.cpp
+xterm -bg white  -fg black -title pingSender -e tst &
+
+

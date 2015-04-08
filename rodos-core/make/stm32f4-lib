@@ -1,0 +1,54 @@
+#! /bin/bash
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi
+
+source ${RODOS_MAKES}/stm32f4-set-vars
+
+############ frome here: generic-lib
+cd ${RODOS_LIBS}
+
+\rm -rf ${ARCH}
+mkdir   ${ARCH}
+
+
+while getopts ':p:' OPTION ; do
+  case "$OPTION" in
+    p)   echo "Compiling Rodos Library for Bootimage on Flash-Page $OPTARG"; 
+         echo "Attention! Binary has later to be linked for this page."; 
+         export CFLAGS=" ${CFLAGS} -DBOOTIMAGE_PAGE=$OPTARG ";;
+    *)   echo "Unbekannter Parameter"
+  esac
+done
+
+# compile RODOS hw-independent files
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${RODOS_SRC1}/*.cpp  -c &
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${RODOS_SRC2}/*.cpp  -c &
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${RODOS_SRC3}/*.cpp  -c &
+#${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${RODOS_SUPPORT_LIBS}/*.cpp  -c &
+
+
+# compile hw-dependent files
+${C_COMP}   -x assembler-with-cpp ${CFLAGS} ${INCLUDES} -c ${RODOS_ARCH_SRC1}/startup/*.S -c &
+${C_COMP}   ${CFLAGS} ${INCLUDES} -c ${RODOS_ARCH_SRC1}/*.c -c &
+${C_COMP}   ${CFLAGS} ${INCLUDES} -c ${RODOS_ARCH_SRC1}/startup/*.c -c &
+${C_COMP}   ${CFLAGS} ${INCLUDES} -c ${RODOS_ARCH_SRC5}/../src/*.c -c &
+
+
+${C_COMP}   ${CFLAGS} ${INCLUDES} -c ${RODOS_ARCH_SRC6}/*.c -c &
+
+${CPP_COMP}   ${CFLAGS} ${CPPFLAGS} ${INCLUDES} -c ${RODOS_ARCH_SRC1}/*.cpp -c &
+${CPP_COMP}   ${CFLAGS} ${CPPFLAGS} ${INCLUDES} -c ${RODOS_ARCH_SRC3}/*.cpp -c &
+${CPP_COMP}   ${CFLAGS} ${CPPFLAGS} ${INCLUDES} -c ${RODOS_ARCH_SRC6}/*.cpp -c &
+wait
+${AR} -rc librodos.a *.o
+mv librodos.a ${ARCH}
+\rm -f *.o
+
+source ${RODOS_MAKES}/check_rodos_support
+echo ""
+echo "Building support-libs ..."
+cd ${RODOS_SUPPORT_LIBS}
+source doit-stm32f4
+

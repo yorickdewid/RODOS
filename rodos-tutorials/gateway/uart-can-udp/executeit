@@ -1,0 +1,15 @@
+\rm -f tst*
+
+
+linux-executable commandGenerator.cpp topics.cpp  gateway.cpp 
+
+mv tst tst-sender
+xterm -bg white  -fg black -title senders -e tst-sender &
+
+linux-executable topics.cpp  commandReceiver.cpp gateway.cpp 
+
+mv tst tst-receiver
+xterm -bg white  -fg black -title receivers -e tst-receiver &
+
+
+

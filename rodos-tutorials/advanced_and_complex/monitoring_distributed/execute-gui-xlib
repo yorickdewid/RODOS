@@ -1,0 +1,34 @@
+#  !/usr/bin/sh
+
+
+linux-executable  gateway.cpp print-in-mask.cpp 
+mv tst tst_monitor-mask
+linux-executable  gateway.cpp printer-graphical.cpp
+mv tst tst_monitor-gui
+
+
+linux-executable gateway.cpp usertask_cntOddEven.cpp usertask_evencnt.cpp
+mv tst tst_user1
+linux-executable gateway.cpp usertask_negcnt.cpp usertask_oddcnt.cpp 
+mv tst tst_user2
+linux-executable gateway.cpp usertask_primcnt.cpp
+mv tst tst_user3
+
+
+
+build_supportprograms
+
+xterm -title gui-server -e  ${RODOS_SUPPORT_PROGS}/server-xlib-freedrawing/tst &
+sleep 1
+xterm -bg yellow  -fg black -title monitor-GUI -e tst_monitor-gui &
+
+
+sleep 2
+xterm -bg white  -fg black -title even-cnt   -e tst_user1 &
+xterm -bg white  -fg black -title neg-odd    -e tst_user2 &
+xterm -bg white  -fg black -title prim-cnt   -e tst_user3 &
+
+sleep 1
+xterm -bg yellow  -fg black -title monitor-mask -e tst_monitor-mask &
+
+

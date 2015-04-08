@@ -1,0 +1,39 @@
+# sparc64 configuration to run on the SIMICS emulator
+# written by Andre Bartke <dev@bartke.cc>
+#
+# adapted from
+# - walnut-cd-install1.simics
+# - modified to boot from CD-ROM
+#
+$do_boot  = "no"
+$do_login = "no"
+$add_disk = FALSE
+$disk_file = "/tmp/tmp.disk"
+
+run-command-file "%simics%/targets/sunfire/walnut-common.simics"
+
+$scsi_disk.sd.add-diff-file -replace -rw $disk_file
+
+script-branch {
+    local $con = ($console.con)
+    $con.wait-for-string "ok "
+    $con.input "boot cdrom\n"
+    $con.wait-for-string "Restarting"
+    $con.wait-for-string "Resetting..."
+    stop
+    # Make sure the PROM is properly configured for the reboot
+    $system.set-prom-env diag-device disk1
+}
+
+# create a new vtoc on the disk
+$scsi_disk.sd.create-sun-vtoc-header -quiet 10940 19 80
+
+#$cdrom_path = "image.iso"; set via commandline $ simics -e "$cdrom..." cfg...
+($scsi_cdrom.get-component-object cd).insert (new-file-cdrom $cdrom_path)
+
+$system.set-prom-env boot-command "boot cdrom"
+$system.set-prom-env auto-boot? true
+
+enable-magic-breakpoint
+continue
+

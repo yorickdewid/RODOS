@@ -1,0 +1,12 @@
+#date -d "21 Oct 2015  14:15:16"
+
+
+if [ $# -ne 2 ]
+then
+  echo "searchs in .elf file FILE the symbol SYMBOL and prints its address"
+  echo "use ADDRESS FILE SYMBOL"
+  exit 1
+fi
+
+nm --radix=d -S $1 | c++filt  | grep $2 
+

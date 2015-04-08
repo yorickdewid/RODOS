@@ -1,0 +1,65 @@
+This implementation is using the fatfs-library for writing on the sd-card (http://elm-chan.org/).
+To use this library, the sd-card-controller or spi layer has to be implemented in the file diskio.cpp. One example is in /filesystem/bare-metal/raspberrypi/.
+It is possible to send various commands via the fatfs library to the sd-card. These Commands have to be implemented in the diskio.cpp, too.
+
+The possible commands that the sd-card-controller can handle are listed below:
+
+Important sd-card commands:
+Command	Argument	Data	Abbreviation		Description
+CMD0	None(0)		No	GO_IDLE_STATE		Software reset.
+CMD1	None(0)		No	SEND_OP_COND		Initiate initialization process.
+ACMD41 	 		No	APP_SEND_OP_COND	For only SDC. Initiate initialization process.
+CMD8	 		No	SEND_IF_COND		For only SDC V2. Check voltage range.
+CMD9	None(0)		Yes	SEND_CSD		Read CSD register.
+CMD10	None(0)		Yes	SEND_CID		Read CID register.
+CMD12	None(0)		No	STOP_TRANSMISSION	Stop to read data.
+CMD16	Block length 	No	SET_BLOCKLEN		Change R/W block size.
+CMD17	Address[31:0]	Yes	READ_SINGLE_BLOCK	Read a block.
+CMD18	Address[31:0]	Yes	READ_MULTIPLE_BLOCK	Read multiple blocks.
+CMD23	Num. of blocks 	No	SET_BLOCK_COUNT		For only MMC. Define number of blocks to transfer with next multi-block read/write command.
+ACMD23 	Num. of blocks	No	SET_WR_BLOCK_ERASE_COUNT For only SDC. Define number of blocks to pre-erase with next multi-block write command.
+CMD24	Address[31:0]	Yes	WRITE_BLOCK		Write a block.
+CMD25	Address[31:0]	Yes	WRITE_MULTIPLE_BLOCK	Write multiple blocks.
+CMD55 	None(0)		No	APP_CMD			Leading command of ACMD<n> command.
+CMD58	None(0)		No	READ_OCR		Read OCR.
+
+All sd-card commands:
+CMD0	GO_IDLE_STATE
+CMD1	SEND_OP_COND
+CMD5	IO_SEND_OP_COND
+CMD6	SWITCH_FUNC
+CMD9	SEND_CSD
+CMD10	SEND_CID
+CMD12	STOP_TRANSMISSION 
+CMD13	SEND_STATUS
+CMD16	SET_BLOCKLEN	
+CMD17	READ_SINGLE_BLOCK	
+CMD18	READ_MULTIPLE_BLOCK 
+CMD24	WRITE_BLOCK
+CMD25	WRITE_MULTIPLE_BLOCK
+CMD27	PROGRAM_CSD
+CMD28	SET_WRITE_PROT
+CMD29	CLR_WRITE_PROT
+CMD30	SEND_WRITE_PROT
+CMD32	ERASE_WR_BLK_START
+CMD33	ERASE_WR_BLK_END
+CMD38	ERASE
+CMD42	LOCK_UNLOCK
+CMD52	IO_RW_DIRECT
+CMD53	IO_RW_EXTENDED
+CMD55	APP_CMD
+CMD56	GEN_CMD
+CMD58	READ_OCR
+CMD59	CRC_ON_OFF
+ACMD13 	SD_STATUS
+ACMD22 	SEND_NUM_WR_BLOCKS
+ACMD23 	SET_WR_BLK_ERASE_COUNT
+ACMD41 	SD_APP_OP_COND
+ACMD42 	SET_CLR_CARD_DETECT
+ACMD51 	SEND_SCR
+
+For further information:
+https://www.sdcard.org/developers/overview/sdio/sdio_spec/Simplified_SDIO_Card_Spec.pdf
+http://elm-chan.org/docs/mmc/mmc_e.html
+http://www.chlazza.net/sdcardinfo.html
+

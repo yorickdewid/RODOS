@@ -1,0 +1,19 @@
+
+crt.S
+	nur 16 bytes (4 befehle) pro trap
+	trap table
+	reset vector
+	es ruft reset.S auf
+
+
+reset.S 
+CPU initialiserung (sieh pruüfsumme geschutzte register)
+Register alle uaf 0.
+ist der booter
+er kann unter umstaende (siehe hw_config) den code von Flash
+auf ram kopieren bevor es gestartet wird
+
+
+
+
+

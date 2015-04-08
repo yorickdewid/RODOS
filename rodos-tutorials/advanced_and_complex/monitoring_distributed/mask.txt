@@ -1,0 +1,19 @@
+*** See support_programs/maskgen ****
+
+  Neg counter time [NEGT            ]
+-------------------------------------------------------------------
+  odd cnt [OST]  [OCNT   ]  even cnt [ECNT   ]   ven pre [EPRE    ]
+
+-------------------------------------------------------------------
+Prim counter
+           msg type  [PRIMTYPE  ]
+           part 1    [PRIM1     ]
+           part 2    [PRIM2     ]
+
+-----------------------------------------------------------------
+           Odd / even cnt [CNT  ] :  [NAME  ] [LB]
+
+--------------------------------------------------------------
+          unknown meesage counter [ERR ] Type [ERRT] 
+
+

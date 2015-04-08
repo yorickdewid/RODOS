@@ -1,0 +1,3 @@
+valgrind --tool=memcheck --log-file-exactly=tst-log tst
+#valgrind --tool=callgrind --log-file-exactly=tst-log tst
+

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/arm-set-vars
+
+TARGET=lpc2468
+FLASH_PROG=lpc21isp
+FLASG_PROG_PATH=$ARM_TOOLS
+FLASH_PROG_COMMAND=$FLASH_PROG_PATH/$FLASH_PROG
+OBJCOPY=arm-none-eabi-objcopy
+OBJCOPY_PATH=$ARM_TOOLS
+OBJCOPY_COMMAND=$OBJCOPY_PATH/$OBJCOPY
+
+
+if [ -x $FLASH_PROG_COMMAND ]; then
+    echo "$FLASH_PROG: installed"
+else
+    # check whether programmer is installed in the default path
+    command -v $FLASH_PROG >/dev/null 2>&1 || { echo "$FLASH_PROG: NOT installed (try: sudo apt-get install $FLASH_PROG)" >&2; exit 1; }
+    FLASH_PROG_COMMAND="$(command -v $FLASH_PROG)"
+    echo "$FLASH_PROG: installed "
+fi
+
+if [ -x $OBJCOPY_COMMAND ]; then
+    echo "$OBJCOPY: installed"
+else
+    command -v $OBJCOPY >/dev/null 2>&1 || { echo "$OBJCOPY: NOT installed" >&2; exit 1; }
+    OBJCOPY_COMMAND="$(command -v $OBJCOPY)"
+    echo "$OBJCOPY: installed"
+fi
+
+
+if [ -z $1 ]; then
+    ELFFILE="$TARGET.elf"
+else
+    ELFFILE=$1
+fi
+
+
+if [ -f ./$ELFFILE ]; then
+    echo "$ELFFILE: OK"
+    $OBJCOPY_COMMAND -O ihex $ELFFILE $TARGET.hex
+else
+    echo "$ELFFILE: FAIL"
+    exit 1;
+fi
+
+
+if [ -f ./$TARGET.hex ]; then
+    echo "$TARGET.hex: OK"
+else
+    echo "$TARGET.hex: FAIL"
+    exit 1;
+fi
+
+
+echo "please press reset before loading"
+echo "Enter number of USB-port, lpc2468-board is connected to ([0]-ttyUSB0, 1-ttyUSB1):"
+read IF_NUMBER
+if [ -z $IF_NUMBER ]; then
+    IF_NUMBER=0
+fi
+INTERFACE="ttyUSB$IF_NUMBER"
+"superuser password to write in /dev/${INTERFACE}"
+
+sudo chmod 0666 /dev/${INTERFACE}
+
+echo loading ${ELFFILE}
+
+$FLASH_PROG_COMMAND -hex ${TARGET}.hex /dev/${INTERFACE} 115200 12000
+
+LPC2468_startfromflash ${INTERFACE}

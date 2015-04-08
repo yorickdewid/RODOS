@@ -1,0 +1,79 @@
+#!/bin/bash
+
+#************************************************************************
+# Script that creates the environment for the Cross Compilation 
+#************************************************************************
+source ${RODOS_MAKES}/console_colors
+echo $GREEN_BOLD"----- SETTING RODOS FOR iMX6 MULTI-CORE ENVIRONMENT -----"
+
+# If $RODOS_ROOT is a empty string, print an error
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning $1
+fi  
+
+echo $BLUE_BOLD"      -> Setting environment"
+source ${RODOS_MAKES}/iMX6-set-vars
+
+# Move to directory /rodos-101/libs
+cd ${RODOS_LIBS}
+# Remore actual directory and create a new one
+\rm -rf ${ARCH}
+mkdir   ${ARCH}
+
+# Print no informatin
+PRINTF_INFO=0
+
+
+echo $BLUE_BOLD"      -> Compiling files for:" ${DIRECTORY_FLAG}
+# Board independent files **#
+echo $CYAN_BOLD"           rodos/src/independent/"
+${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${RODOS_ROOT}/src/independent/*.cpp
+echo "           rodos/src/independent/gateway/"
+${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${RODOS_ROOT}/src/independent/gateway/*.cpp
+echo "           rodos/src/bare-metal-generic/"
+${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${MY_SRCS}/*.cpp
+#***************************#
+
+# Board dependent files ****#
+echo "           rodos/src/bare-metal/arm-cortexA9/"
+${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/*.cpp
+#${CC_COMP}  ${C_FLAGS}   ${INCLUDES} -c ${MY_HW_SRCS}/*.c
+${CXX_COMP} ${ASM_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/*.S
+${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/hal/*.cpp
+
+echo "           rodos/src/bare-metal/arm-cortexA9/src/core/"
+${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/src/core/*.cpp
+${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/src/core/*.c
+${CXX_COMP} ${ASM_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/src/core/*.S
+
+echo "           rodos/src/bare-metal/arm-cortexA9/src/iomux"
+${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/src/iomux/*.c
+
+echo "           rodos/src/bare-metal/arm-cortexA9/drivers/src"
+${CC_COMP} ${C_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/drivers/src/epit/*.c 
+${CC_COMP} ${C_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/drivers/src/gpt/*.c
+${CC_COMP} ${C_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/drivers/src/MPCore/*.c
+${CC_COMP} ${C_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/drivers/src/global_timer/*.c
+${CC_COMP} ${C_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/drivers/src/uart/*.c
+${CC_COMP} ${C_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/drivers/src/flexcan/*.c
+${CC_COMP} ${C_FLAGS} ${INCLUDES} -c ${MY_HW_SRCS}/drivers/src/i2c/*.c
+
+#***************************#
+
+# Rodos library ************#
+#echo "           rodos-101/support_libs/"
+#${CXX_COMP} ${CXX_FLAGS} ${INCLUDES} -c ${RODOS_SUPPORT_LIBS}/*.cpp	
+#***************************#
+
+# Archive and delete .o ****#
+ar rc librodos.a *.o
+mv librodos.a ${ARCH}/${DIRECTORY_FLAG}
+\rm -f *.o
+#***************************#
+echo $GREEN_BOLD"----- RODOS FOR iMX6 MULTI-CORE ENVIRONMENT DONE -----"$RESET
+
+source ${RODOS_MAKES}/check_rodos_support
+
+cd ${RODOS_ROOT}
+
+

@@ -1,0 +1,29 @@
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/arm-set-vars
+
+
+cd ${RODOS_LIBS}
+
+\rm -rf ${ARCH}
+mkdir   ${ARCH}
+
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${RODOS_ROOT}/src/independent/*.cpp  -c
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${RODOS_ROOT}/src/independent/gateway/*.cpp  -c
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${MY_SRCS}/*.cpp  -c
+
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${MY_HW_SRCS}/*.cpp -c
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${MY_HW_SRCS}/*/*.cpp -c
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${MY_HW_SRCS}/*.S -c
+
+#${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  ${RODOS_SUPPORT_LIBS}/*.cpp  -c
+
+#mv 00globalobjects.o ${ARCH}    >& /dev/null
+ar rc librodos.a *.o
+mv librodos.a ${ARCH}
+\rm -f *.o
+
+source ${RODOS_MAKES}/check_rodos_support
+

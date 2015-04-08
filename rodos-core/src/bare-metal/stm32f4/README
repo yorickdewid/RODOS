@@ -1,0 +1,10 @@
+This port uses:
+UART            for stdout via xprintf/PRINTF -> can be changed in params.h
+Timer 2         for RODOS time base
+SysTick Timer   for preemption
+40kB RAM        for Thread stacks -> can be changed in params.h
+
+During startup is used:
+Timer 5         for Watchdog init -> can be used after hwInit() (see hw_specific.cpp for details on redefining ISR)
+
+TODO: free Timer 2 -> use also SysTick timer for RODOS time base

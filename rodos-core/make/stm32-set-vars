@@ -1,0 +1,46 @@
+#! /bin/bash
+
+ARCH=stm32
+
+SUB_ARCH=MD	# defines which kind of stm32 you are working with
+			# possible values: 	MD - Medium Density (128k Flash, 20k RAM) (Olimex STM32-P103 Board)
+			#					HD - High Density (512k Flash, 64k RAM) (Mulitsensorboard)
+			#					CL - Connectivity Line (256k Flash, 64k RAM)
+			# If you switch between HD and MD you have to recompile stm32-lib
+
+if [ ${SUB_ARCH} = HD ]; then
+	DENSITY_WARNING="RODOS-warning: STM32F10X_${SUB_ARCH} is set! e.g. on Multisensorboard"
+elif [ ${SUB_ARCH} = MD ]; then
+	DENSITY_WARNING="RODOS-warning: STM32F10X_${SUB_ARCH} is set! e.g. on Olimex STM-P103 evalboard"
+elif [ ${SUB_ARCH} = CL ]; then
+	DENSITY_WARNING="RODOS-warning: STM32F10X_${SUB_ARCH} is set! e.g. on Olimex STM-P107 evalboard"
+else
+	DENSITY_WARNING="ERROR: STM32F10X_${SUB_ARCH} unknown or unsupported STM32-device is set"
+fi
+
+
+MY_SRCS="${RODOS_ROOT}/src/bare-metal-generic"
+MY_HW_SRCS="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+
+
+CFLAGS_BASICS="-fno-exceptions -Wno-unused-parameter -Wno-long-long -Os -pipe -Wall -g"
+HWCFLAGS=" -mcpu=cortex-m3 -mthumb   -msoft-float -DSTM32F10X_${SUB_ARCH}"
+#-mthumb -mfloat-abi=soft
+
+
+INCLUDES=" -I. -I${RODOS_API}  -I${MY_SRCS}  -I${MY_HW_SRCS} -I${MY_HW_SRCS}/stm32  -I${RODOS_SUPPORT_LIBS} ${APP_INCLUDES}"
+
+#echo "RODOS-warning: this stm32 has no namespace RODOS"
+CFLAGS=" ${CFLAGS_BASICS} ${HWCFLAGS} "
+#CPPFLAGS="-fno-rtti -fno-exceptions  -D NO_RODOS_NAMESPACE"
+CPPFLAGS="-fno-rtti -fno-exceptions "
+
+
+LINKFLAGS="  -T${MY_HW_SRCS}/link_stm32_${SUB_ARCH}.ld -fno-unwind-tables -fno-asynchronous-unwind-tables -L${RODOS_LIBS}/${ARCH}  -Wl,--start-group -lrodos -lc -Wl,--end-group "
+
+ARM_TOOLS="/opt/arm-tools/bin"
+
+CPP_COMP="${ARM_TOOLS}/arm-none-eabi-c++ "
+C_COMP="${ARM_TOOLS}/arm-none-eabi-gcc "
+
+ENTRY=ResetISR

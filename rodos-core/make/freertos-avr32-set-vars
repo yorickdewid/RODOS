@@ -1,0 +1,79 @@
+#!/bin/bash
+###############################################################################
+#
+# FreeRTOS comes along with a number of ports. The port to be used has to
+# be specified separately. The corresponding files are located as follows:
+#
+# rodos
+#  |- api
+#  |- src
+#     |- on-freertos       - Wrapper for FreeRTOS kernel: ${ARCH}
+#        |- FreeRTOS       - FreeRTOS kernel 
+#           |- include     - FreeRTOS kernel includes
+#           |- portable
+#              |- MemMang  - varies possibly with the architecture
+#              |- Posix - architecture dependend ports: ${SUB_ARCH}
+#              |- PC    - Platform dependend ports    : ${SUB_PLATFORM}
+#
+################################################################################
+#!/bin/bash
+ARCH=freertos
+SUB_ARCH=AVR32_UC3
+#SUB_PLATFORM=Common/Full
+#SUB_PLATFORM=Common/Minimal
+
+MY_SRCS="${RODOS_ROOT}/src/on-freertos"
+#MY_HW_SRCS="${RODOS_ROOT}/src/on-freertos"
+
+LIB_INCLUDES=" \
+-I ${RODOS_ROOT}/src/on-freertos/FreeRTOS/Source/include \
+-I ${RODOS_ROOT}/src/on-freertos/FreeRTOS/Source/portable/MemMang/ \
+-I ${RODOS_ROOT}/src/on-freertos/FreeRTOS/Source/portable/GCC/${SUB_ARCH} \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH} \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/BOARDS \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/UTILS \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/UTILS/PREPROCESSOR \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/INTC \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/FLASH \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/PM \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/GPIO \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/TC \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/USART \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/NEWLIB_ADDONS/INCLUDE \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/Common/include \
+-I${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/BOARDS/EVK1100"
+
+LIB_SRCS="${RODOS_ROOT}/src/on-freertos/FreeRTOS/Source \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Source/portable/GCC/${SUB_ARCH} \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/BOARDS/EVK1100 \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/FLASH \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/GPIO \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/INTC \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/PM \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/TC \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/DRIVERS/USART \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/NEWLIB_ADDONS \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/ParTest \
+${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/Common/ \
+${RODOS_ROOT}/src/on-freertos/"
+#${RODOS_ROOT}/src/on-freertos/FreeRTOS/Sources/portable/MemMang \
+#${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/serial \
+
+MY_LINKER_SCRIPT="${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/${SUB_ARCH}/UTILS/LINKER_SCRIPTS/AT32UC3A/0512/GCC"
+
+INCLUDES=" -I. -I ${RODOS_API} -I${RODOS_SUPPORT_LIBS} -I ${MY_SRCS} ${LIB_INCLUDES} ${APP_INCLUDES}"
+
+# Debug Flags
+CFLAGS_BASICS="-D__AVR32_UC3A0512__ -DBOARD=EVK1100 -fno-exceptions -Wno-unused-parameter -O1 -Wno-long-long -pipe -Wall -g3 -gdwarf-2 -fmessage-length=0 -ffunction-sections -masm-addr-pseudos"
+# Release Flags
+#CFLAGS_BASICS="-D__AVR32_UC3A0512__ -DBOARD=EVK1100 -fno-exceptions -Wno-unused-parameter -O3 -Wno-long-long -pipe -Wall -fmessage-length=0 -ffunction-sections -masm-addr-pseudos"
+HWCFLAGS="-mpart=uc3a0512"
+CFLAGS=" ${CFLAGS_BASICS} ${HWCFLAGS} -c"
+CPPFLAGS=""
+
+FIRST_LINK_OBJ=" ${RODOS_LIBS}/${ARCH}/00globalobjects.o "
+LINKFLAGS="-T${MY_LINKER_SCRIPT}/link_uc3a0512.lds -Wl,--gc-sections --rodata-writable -L${RODOS_LIBS}/${ARCH} ${APP_LIBS} -Wl,--start-group -lrodos -lnlao -lc -lm -Wl,--end-group"
+
+AVR_TOOLS="/opt/avr-tools/bin/"
+CPP_COMP=${AVR_TOOLS}"avr32-g++"
+C=${AVR_TOOLS}"avr32-gcc"

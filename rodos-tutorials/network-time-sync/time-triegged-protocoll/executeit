@@ -1,0 +1,14 @@
+cd client/
+doit 
+cd ..
+cd server/
+doit 
+cd ..
+
+xterm -fg green -bg black -title "TTP Reciever" -e server/tst &
+sleep 2
+xterm -fg blue -bg white -title "TTP Sender" -e client/tst &
+xterm -fg blue -bg white -title "TTP Sender" -e client/tst &
+xterm -fg blue -bg white -title "TTP Sender" -e client/tst &
+xterm -fg blue -bg white -title "TTP Sender" -e client/tst &
+

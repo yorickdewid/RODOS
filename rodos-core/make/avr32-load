@@ -1,0 +1,65 @@
+#! /bin/bash
+
+AVR_TOOLS="/opt/avr-tools/bin"
+
+DFU_PROG=dfu-programmer
+DFU_PROG_PATH=$AVR_TOOLS
+DFU_PROG_COMMAND=$DFU_PROG_PATH/$DFU_PROG
+OBJCOPY=avr32-objcopy
+OBJCOPY_PATH=$AVR_TOOLS
+OBJCOPY_COMMAND=$OBJCOPY_PATH/$OBJCOPY
+
+
+if [ -x $DFU_PROG_COMMAND ]; then
+	echo "$DFU_PROG: installed"
+else
+	# check whether programmer is installed in the default path
+	command -v $DFU_PROG >/dev/null 2>&1 || { echo "$DFU_PROG: NOT installed (try: sudo apt-get install dfu-programmer)" >&2; exit 1; }
+	DFU_PROG_COMMAND="$(command -v $DFU_PROG)"
+	echo "$DFU_PROG: installed "
+fi
+
+
+if [ -x $OBJCOPY_COMMAND ]; then
+	echo "$OBJCOPY: installed"
+else
+	command -v $OBJCOPY >/dev/null 2>&1 || { echo "$OBJCOPY: NOT installed" >&2; exit 1; }
+	OBJCOPY_COMMAND="$(command -v $OBJCOPY)"
+	echo "$OBJCOPY: installed"
+fi
+
+
+if [ -f ./avr32.elf ]; then
+	echo "avr32.elf: OK"
+#	rm *.hex &> /dev/null
+	$OBJCOPY_COMMAND -O ihex avr32.elf avr32.hex
+else
+	echo "avr32.elf: FAIL"
+	exit 1;
+fi
+
+
+if [ -f ./avr32.hex ]; then
+	echo "avr32.hex: OK"
+else
+	echo "avr32.hex: FAIL"
+	exit 1;
+fi
+
+
+echo "1. Press reset button and joystick together"
+echo "2. First release reset then joystick"
+echo "3. Press enter"
+read
+
+sleep 3
+
+echo "Erasing flash ..."
+$DFU_PROG_COMMAND at32uc3a0512 erase --suppress-bootloader-mem
+
+echo "Programming new image ..."
+$DFU_PROG_COMMAND at32uc3a0512 flash avr32.hex
+
+echo "Starting brand new code ..."
+$DFU_PROG_COMMAND at32uc3a0512 start
+

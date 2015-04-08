@@ -1,0 +1,177 @@
+;
+; Trace32-script to programm avr32 executable ("Trace32 PowerView" is software of Lauterbach GmbH)
+; -> to use this script, copy it into the same directory as the executable file "avr32.elf"
+;    and choose "File"->"Run Batchfile..." in Trace32 software
+; -> sometimes it is not working the first time, then just try it twice
+;
+;
+; Example for flash declaration of Atmel AT32UC3A internal flash.
+;
+; List of AT32UC3A derivatives and their configuration:
+;
+;   CPU-Type       FlashSize   RamSize
+;                    (Byte)     (Byte)
+;   -----------------------------------
+;   AT32UC3A0128    0x20000     0x8000
+;   AT32UC3A0256    0x40000    0x10000
+;   AT32UC3A0512    0x80000    0x10000
+;   AT32UC3A1128    0x20000     0x8000
+;   AT32UC3A1256    0x40000    0x10000
+;   AT32UC3A1512    0x80000    0x10000
+;
+; Internal flash is located at 0x80000000
+; Internal SRAM is located at  0x00000000
+;
+; $Author: wdoering $
+; $Date: 2011-03-09 18:00:51 +0100 (Mi, 09 Mrz 2011) $
+; $Rev: 1251 $
+;
+
+  ;========================================================================
+  ; Start debugging
+
+  SYStem.RESet
+  SYStem.CPU UC3A0512
+  SYStem.Up
+  SYStem.JtagClock 1MHz
+  ;SYStem ; shows CPU -> "System Settings..." dialog
+
+  ;========================================================================
+  ; Flash declaration
+
+  FLASH.RESet
+  GOSUB FlashDeclaration
+  MAP.BOnchip 0x80000000++0x0007ffff
+  ;FLASH.List
+
+  ;========================================================================
+  ; Flash programming example
+
+  DIALOG.YESNO "Program flash memory?"
+  LOCAL &progflash
+  ENTRY &progflash
+  IF &progflash 
+  (
+    ; Unlock locked pages if necessary
+    ;FLASH.UNLOCK ALL
+
+    FLASH.AUTO.ALL
+    Data.LOAD.auto avr32.elf
+    FLASH.AUTO.off
+    
+    ; verify the FLASH contents
+	Data.LOAD.auto avr32.elf /DIFF
+	IF FOUND()
+	PRINT "Verify error after FLASH programming"
+	ELSE
+	(
+		PRINT "FLASH programming completed successfully"
+		Data.List								; show source code dialog - same as: View -> List Source
+		;Register								; show processor register dialog - same as: View -> Registers
+;		Break.List								; show breakpoint list dialog
+		Break.Set main							; set breakpoint at main
+		;Var.View h1 h2 uart0 uart1 uart2 uart3
+;		Var.Local
+;		Var.Watch
+		Go
+	)
+  )
+
+  ENDDO
+
+
+;========================================================================
+; Flash declaration depending on configuration 
+
+FlashDeclaration:
+  LOCAL &CPU
+  LOCAL &FlashSize
+
+  &CPU=CPU()
+  IF ("&CPU"=="UC3A0128")||("&CPU"=="UC3A1128")
+  (
+    &FlashSize=0x20000
+  )
+  ELSE IF ("&CPU"=="UC3A0256")||("&CPU"=="UC3A1256")
+  (
+    &FlashSize=0x40000
+  )
+  ELSE IF ("&CPU"=="UC3A0512")||("&CPU"=="UC3A1512")
+  (
+    &FlashSize=0x80000
+  )
+  ELSE
+  (
+    LOCAL &FSZ
+    &FSZ=(Data.Long(D:0xFFFE1408)&0xE000)>>13.
+    IF &FSZ==0x00 
+    (
+      &FlashSize=0x8000
+    )
+    IF &FSZ==0x01 
+    (
+      &FlashSize=0x10000
+    )
+    IF &FSZ==0x02
+    (
+      &FlashSize=0x20000
+    )
+    IF &FSZ==0x03
+    (
+      &FlashSize=0x40000
+    )
+    IF &FSZ==0x04
+    (
+      &FlashSize=0x60000
+    )
+    IF &FSZ==0x05
+    (
+      &FlashSize=0x80000
+    )
+    IF &FSZ==0x06
+    (
+      &FlashSize=0xC0000
+    )
+    IF &FSZ==0x07
+    (
+      &FlashSize=0x100000
+    )
+    PRINT "Auto detected flash size is &FlashSize Byte"
+  )
+
+  IF &FlashSize>=0x008000
+  (
+    FLASH.Create 1. 0x80000000--0x80007fff 0x200 TARGET Long
+  )
+  IF &FlashSize>=0x010000
+  (
+    FLASH.Create 1. 0x80008000--0x8000ffff 0x200 TARGET Long
+  )
+  IF &FlashSize>=0x020000
+  (
+    FLASH.Create 1. 0x80010000--0x8001ffff 0x200 TARGET Long
+  )
+  IF &FlashSize>=0x040000
+  (
+    FLASH.Create 1. 0x80020000--0x8003ffff 0x200 TARGET Long
+  )
+  IF &FlashSize>=0x060000
+  (
+    FLASH.Create 1. 0x80040000--0x8005ffff 0x200 TARGET Long
+  )
+  IF &FlashSize>=0x080000
+  (
+    FLASH.Create 1. 0x80060000--0x8007ffff 0x200 TARGET Long
+  )
+  IF &FlashSize>=0x0C0000
+  (
+    FLASH.Create 1. 0x80080000--0x800bffff 0x200 TARGET Long
+  )
+  IF &FlashSize>=0x100000
+  (
+    FLASH.Create 1. 0x800c0000--0x800fffff 0x200 TARGET Long
+  )
+
+  FLASH.TARGET 0x1000 0x2000 0x400 ~~/demo/avr32/flash/long/flashc.bin
+
+  RETURN

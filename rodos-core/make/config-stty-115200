@@ -1,0 +1,26 @@
+#! /bin/sh 
+# /bin/sh -x
+
+BAUD=${BAUD-115200}
+FLOW=${FLOW-0}
+
+if test "$FLOW" = "1"
+then
+    CRTSCTS="crtscts"
+else
+    CRTSCTS="-crtscts"
+fi
+
+for DEV in /dev/ttyS0 /dev/ttyS1 /dev/ttyS2
+do
+    stty sane < $DEV
+    stty raw < $DEV
+    stty $CRTSCTS < $DEV
+    stty cs8 < $DEV
+    stty parenb < $DEV
+    stty parodd < $DEV
+    stty -cstopb < $DEV
+    stty speed $BAUD < $DEV
+    stty -a < $DEV
+done
+

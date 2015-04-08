@@ -1,0 +1,70 @@
+#!/bin/bash
+
+#************************************************************************
+# Script that sets the variables for the compilation of rodos for
+# the arm envoirenment. 
+#************************************************************************
+
+# PROJECT ******************#
+ARCH=arm-cortexA8
+MY_SRCS="${RODOS_ROOT}/src/bare-metal-generic"
+MY_HW_SRCS="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+#***************************#
+
+# ARM TOOLS ****************#
+ARM_TOOLS="/opt/arm-tools"
+ARM_VERSION="4.6.3"
+ARM_TOOLS_BIN="${ARM_TOOLS}/bin"
+CXX_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-g++ "
+CC_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-gcc "
+CPP_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-cpp "
+AS_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-as "
+LD_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-ld "
+OBJCOPY="${ARM_TOOLS_BIN}/arm-none-eabi-objcopy "
+OBJDUMP="${ARM_TOOLS_BIN}/arm-none-eabi-objdump "
+#***************************#
+
+# ARM MODE OPTIONS *********#
+ARM_CPU="-mcpu=cortex-a8"
+ARM_FLOAT="-mfloat-abi=soft" #"-msoft-float"
+#***************************#
+
+# Project includes *********#
+MY_HW_INC="${RODOS_ROOT}/src/bare-metal/${ARCH}/include"
+MY_HW_HW="${RODOS_ROOT}/src/bare-metal/${ARCH}/include/hw"
+MY_HW_ARMV7A="${RODOS_ROOT}/src/bare-metal/${ARCH}/include/armv7a"
+MY_HW_AM335X="${RODOS_ROOT}/src/bare-metal/${ARCH}/include/armv7a/am335x"
+INCLUDES=" -I${RODOS_ROOT}/api -I${MY_SRCS} -I${MY_HW_SRCS} -I${MY_HW_INC} -I${MY_HW_HW} -I${MY_HW_ARMV7A} -I${MY_HW_AM335X} -I${RODOS_SUPPORT_LIBS}"
+# System includes **********#
+LIB_GCC_PATH="${ARM_TOOLS}/lib/gcc/arm-none-eabi/$ARM_VERSION/include"
+LIB_GCC_FIX_PATH="${ARM_TOOLS}/lib/gcc/arm-none-eabi/$ARM_VERSION/include-fixed"
+LIB_EABI_PATH="${ARM_TOOLS}/arm-none-eabi/include"
+LIB_CXX_PATH="${ARM_TOOLS}/arm-none-eabi/include/c++/$ARM_VERSION"
+LIB_CXX_EABI_PATH="${ARM_TOOLS}/arm-none-eabi/include/c++/$ARM_VERSION/arm-none-eabi"
+LIB_CXX_BACKWARD_PATH="${ARM_TOOLS}/arm-none-eabi/include/c++/$ARM_VERSION/backward"
+#***************************#
+
+
+# Flags ********************#
+ARM_FLAGS=" ${ARM_CPU} ${ARM_FLOAT}"
+WARNINGS_FLAGS=" -Wall "
+OPTIMIZATION_FLAGS=" "
+DEBUG_FLAGS=" -g "
+# Compiler flags ***********#
+ASM_FLAGS=" -x assembler-with-cpp ${ARM_FLAGS} ${WARNINGS_FLAGS} ${DEBUG_FLAGS}"
+GCC_FLAGS=" ${ARM_FLAGS} ${WARNINGS_FLAGS} ${DEBUG_FLAGS} ${OPTIMIZATION_FLAGS} -Dam335x -Dbeaglebone -Dgcc" 
+CXX_FLAGS=" -fno-rtti -fno-exceptions ${ARM_FLAGS} ${DEBUG_FLAGS} ${WARNINGS_FLAGS} ${OPTIMIZATION_FLAGS} -Dam335x -Dbeaglebone -Dgcc"
+#***************************#
+
+
+
+# LINKER *******************#
+LINKER_SCRIPT="${RODOS_ROOT}/src/bare-metal/${ARCH}/scripts/linkerscript.ld"
+
+LINKER_FLAGS=" -nostartfiles -nodefaultlibs -nostdlib "
+
+LINKER_LIB_PATH="${RODOS_ROOT}/libs/${ARCH}"
+LINKER_LIB_INC=" -lrodos -lm -lc -lgcc "
+
+LINKER_OPTIONS=" ${LINKER_FLAGS} ${ARM_FLAGS} ${DEBUG_FLAGS} "
+#***************************#

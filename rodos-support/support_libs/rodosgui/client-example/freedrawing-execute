@@ -1,0 +1,15 @@
+#export APP_LIBS="-L/usr/lib -lQtGui -lQtCore"
+
+#linux-executable  *.cpp  ../rodosgui.cpp
+
+
+build_supportprograms
+
+xterm -e  ${RODOS_SUPPORT_PROGS}/server-qt-freedrawing/tst &
+sleep 2
+
+linux-executable  freedrawing.cpp
+tst
+
+
+

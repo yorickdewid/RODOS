@@ -1,0 +1,25 @@
+#! /bin/bash
+
+ARCH=avr32
+
+MY_SRCS="${RODOS_ROOT}/src/bare-metal-generic"
+MY_HW_SRCS="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+
+
+INCLUDES=" -I. -I${RODOS_API}  -I${MY_SRCS}  -I${MY_HW_SRCS} -I${MY_HW_SRCS}/avr32_framework  -I${MY_HW_SRCS}/hal  -I${RODOS_SUPPORT_LIBS} ${APP_INCLUDES}"
+
+
+ASM_FLAGS="-x assembler-with-cpp -Wa,-g3"
+
+CFLAGS_BASICS="-D__AVR32_UC3A0512__ -DBOARD=EVK1100 -fno-exceptions -Wno-unused-parameter -Wno-long-long -Os -Wall -g3 -gdwarf-2 -c -fmessage-length=0 -ffunction-sections -masm-addr-pseudos"
+HWCFLAGS="-mpart=uc3a0512"
+CFLAGS=" ${CFLAGS_BASICS} ${HWCFLAGS} "
+
+CPPFLAGS=""
+
+LINKFLAGS="-nostartfiles -L${RODOS_LIBS}/${ARCH} -T${MY_HW_SRCS}/scripts/link_uc3a0512.ld -Wl,--gc-sections -Wl,--direct-data --rodata-writable -lrodos -lc -lgcc"
+AVR_TOOLS="/opt/avr-tools/bin"
+
+CPP_COMP="${AVR_TOOLS}/avr32-g++ "
+C_COMP="${AVR_TOOLS}/avr32-gcc "
+

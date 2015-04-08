@@ -1,0 +1,108 @@
+#!/bin/bash
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi
+
+# Error checking
+if [ $# -lt 2 ]; then
+	echo "Wrong arguments!"
+	echo "arg[0] -> number of active cores"
+	echo "arg[1 - 4] -> program files being compiled"
+	echo "           -> order: prg-cpu0 prg-cpu1 prg-cpu2 prg-cpu3"
+	exit;
+fi
+
+# Create project directory
+\rm -rf iMX6
+mkdir iMX6
+
+# Initialization of variables
+NUMBER_CORE=$(( $1 - 1 ))
+CPU_FLAG="-DCPU"${NUMBER_CORE}
+DIRECTORY_FLAG="cpu"${NUMBER_CORE}
+PRGM_FILE_CPU0=$2
+PRGM_FILE_CPU1=$3
+PRGM_FILE_CPU2=$4
+PRGM_FILE_CPU3=$5
+BIN_FILES=""
+
+# Setting environment
+source ${RODOS_MAKES}/iMX6-set-vars
+source ${RODOS_MAKES}/console_colors
+
+# Compiling and linking the program
+while [ $NUMBER_CORE -gt -1 ]
+do
+	# Create sub-directory for current CPU ID
+	mkdir iMX6/${DIRECTORY_FLAG}
+
+	# Settings *****************#
+	if [ $# -gt 2 ]; then
+		case $NUMBER_CORE in
+		    0)
+			PRGM_FILE=$PRGM_FILE_CPU0;;
+		    1)  
+			PRGM_FILE=$PRGM_FILE_CPU1;;
+		    2)
+			PRGM_FILE=$PRGM_FILE_CPU2;;
+		    3)
+			PRGM_FILE=$PRGM_FILE_CPU3;;
+		esac
+	else
+		PRGM_FILE=$2 
+	fi
+	case $NUMBER_CORE in
+	    0) 
+		LINKER_INPUT="cpu0.elf";
+		OBJCOPY_INPUT="cpu0.elf";
+		OBJCOPY_OUTPUT="cpu0.bin";
+		SCRIPT=$CPU0_SCRIPT;;
+	    1) 
+		LINKER_INPUT="cpu1.elf";
+		OBJCOPY_INPUT="cpu1.elf";
+		OBJCOPY_OUTPUT="cpu1.bin";
+		SCRIPT=$CPU1_SCRIPT;;
+	    2) 
+		LINKER_INPUT="cpu2.elf";
+		OBJCOPY_INPUT="cpu2.elf";
+		OBJCOPY_OUTPUT="cpu2.bin";
+		SCRIPT=$CPU2_SCRIPT;;
+	    3) 
+		LINKER_INPUT="cpu3.elf";
+		OBJCOPY_INPUT="cpu3.elf";
+		OBJCOPY_OUTPUT="cpu3.bin";
+		SCRIPT=$CPU3_SCRIPT;;
+	esac
+	#***************************#
+
+	# Compile target file ******#
+	echo $GREEN_BOLD"Compiling target file for CPU${NUMBER_CORE}:" ${PRGM_FILE}
+	${CXX_COMP} ${CPU_FLAG} ${CXX_FLAGS} ${INCLUDES} -c ${PRGM_FILE}
+	#***************************#	
+
+	# Linking file *************#
+	echo $BLUE_BOLD"Linking target file:            "${PRGM_FILE}" -> "${LINKER_INPUT}
+	${CXX_COMP} -T${SCRIPT} ${LINKER_OPTIONS} -L${LINKER_LIB_PATH} -o ${LINKER_INPUT} *.o ${LINKER_LIB_INC}
+	#***************************#
+	
+	# Converting the image *****#
+	echo $RED_BOLD"Converting:                     cpu"$NUMBER_CORE".elf -> cpu"$NUMBER_CORE".bin (binary) "
+	${OBJCOPY} -O binary ${OBJCOPY_INPUT} ${OBJCOPY_OUTPUT}
+	BIN_FILES="cpu$NUMBER_CORE/$OBJCOPY_OUTPUT $BIN_FILES"
+	#***************************#
+
+	# Move compiled files ******#
+	mv *.o *.elf *.bin iMX6/${DIRECTORY_FLAG}
+	\rm -f *.o *.elf *.bin
+	#***************************#
+
+	NUMBER_CORE=$(( NUMBER_CORE - 1 ))
+	CPU_FLAG="-DCPU"${NUMBER_CORE}
+	DIRECTORY_FLAG="cpu"${NUMBER_CORE}
+done
+
+cd iMX6
+# Converting the final image of the program to one single bin file
+echo $YELLOW_BOLD"Converting to single bin file..." $RESET
+cat $BIN_FILES > iMX6.bin
+#***************************# 

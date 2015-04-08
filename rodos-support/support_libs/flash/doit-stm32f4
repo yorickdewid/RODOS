@@ -1,0 +1,14 @@
+#!/bin/sh
+
+\rm -f *.o
+
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES} ./spiFlash_AT45DBxxx/*.cpp  -c
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES} ./spiFlash_SxxFLxxS/*.cpp  -c
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES} ./spiFlash_N25Q00AA/*.cpp  -c
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES} ./intFlash_stm32f4/*.cpp -c
+
+ar -r ${RODOS_LIBS}/${ARCH}/librodos.a *.o
+\rm -f *.o
+
+
+

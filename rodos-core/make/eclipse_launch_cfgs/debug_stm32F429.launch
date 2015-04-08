@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.cdt.debug.gdbjtag.launchConfigurationType">
+<intAttribute key="org.eclipse.cdt.debug.gdbjtag.core.delay" value="3"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doHalt" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doReset" value="false"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageFileName" value=""/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageOffset" value=""/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.initCommands" value="monitor reset halt"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.ipAddress" value="localhost"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.jtagDevice" value="Generic TCP/IP"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.loadImage" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.loadSymbols" value="true"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.pcRegister" value=""/>
+<intAttribute key="org.eclipse.cdt.debug.gdbjtag.core.portNumber" value="3333"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.runCommands" value=""/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setPcRegister" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setResume" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setStopAt" value="true"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.stopAt" value="main"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.symbolsFileName" value=""/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.symbolsOffset" value=""/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useFileForImage" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useFileForSymbols" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForImage" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForSymbols" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useRemoteTarget" value="true"/>
+<stringAttribute key="org.eclipse.cdt.debug.mi.core.DEBUG_NAME" value="arm-none-eabi-gdb"/>
+<stringAttribute key="org.eclipse.cdt.debug.mi.core.commandFactory" value="Standard (Linux)"/>
+<stringAttribute key="org.eclipse.cdt.debug.mi.core.protocol" value="mi"/>
+<booleanAttribute key="org.eclipse.cdt.debug.mi.core.verboseMode" value="false"/>
+<stringAttribute key="org.eclipse.cdt.dsf.gdb.DEBUG_NAME" value="arm-none-eabi-gdb"/>
+<booleanAttribute key="org.eclipse.cdt.dsf.gdb.UPDATE_THREADLIST_ON_SUSPEND" value="false"/>
+<intAttribute key="org.eclipse.cdt.launch.ATTR_BUILD_BEFORE_LAUNCH_ATTR" value="2"/>
+<stringAttribute key="org.eclipse.cdt.launch.COREFILE_PATH" value=""/>
+<stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_REGISTER_GROUPS" value=""/>
+<stringAttribute key="org.eclipse.cdt.launch.FORMAT" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&lt;contentList&gt;&lt;content id=&quot;distance-data-DisplayThread::loadFromFlash-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;cpsr-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;fps-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;f7-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;f6-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;f5-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;f4-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;f3-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;f2-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;f1-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;f0-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;pc-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;lr-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;sp-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r12-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r11-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r10-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r9-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r8-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r7-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r6-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r5-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r4-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r3-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r2-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r1-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;r0-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;nextBeat-Thread-null-UART::putchar-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;nextBeat-Thread-null-main-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;suspendedUntil-Thread-null-NVIC_SetPriority-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;null-SystemInit-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;FPCCR-null-SystemInit-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;MVFR0-null-SystemInit-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;MVFR1-null-SystemInit-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;distance-rdData-DisplayThread::loadFromFlash-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;distance-test-DisplayThread::init-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;flashAddr-DisplayThread::storeToFlash-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;distance-rdData-DisplayThread::storeToFlash-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;test-DisplayThread::init-(format)&quot; val=&quot;4&quot;/&gt;&lt;content id=&quot;distance-test2-DisplayThread::init-(format)&quot; val=&quot;4&quot;/&gt;&lt;/contentList&gt;"/>
+<stringAttribute key="org.eclipse.cdt.launch.GLOBAL_VARIABLES" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;globalVariableList/&gt;&#10;"/>
+<stringAttribute key="org.eclipse.cdt.launch.MEMORY_BLOCKS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;memoryBlockExpressionList&gt;&#10;&lt;memoryBlockExpressionItem&gt;&#10;&lt;expression text=&quot;0x20000000&quot;/&gt;&#10;&lt;/memoryBlockExpressionItem&gt;&#10;&lt;memoryBlockExpressionItem&gt;&#10;&lt;expression text=&quot;0x2001fa00&quot;/&gt;&#10;&lt;/memoryBlockExpressionItem&gt;&#10;&lt;memoryBlockExpressionItem&gt;&#10;&lt;expression text=&quot;0x8000000&quot;/&gt;&#10;&lt;/memoryBlockExpressionItem&gt;&#10;&lt;/memoryBlockExpressionList&gt;&#10;"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug_STM32F429/stm32f4.elf"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="cityElTacho"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="org.eclipse.cdt.cross.arm.gnu.sourcery.linux.elf.debug.810528067.1912846289"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/cityElTacho"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="4"/>
+</listAttribute>
+<mapAttribute key="org.eclipse.debug.core.preferred_launchers">
+<mapEntry key="[debug]" value="org.eclipse.cdt.debug.gdbjtag.core.cdiLaunchDelegate"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.debug.core.source_locator_id" value="org.eclipse.cdt.debug.core.sourceLocator"/>
+<stringAttribute key="org.eclipse.debug.core.source_locator_memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;sourceLookupDirector&gt;&#10;&lt;sourceContainers duplicates=&quot;false&quot;&gt;&#10;&lt;container memento=&quot;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot; standalone=&amp;quot;no&amp;quot;?&amp;gt;&amp;#10;&amp;lt;project name=&amp;quot;rodos&amp;quot; referencedProjects=&amp;quot;false&amp;quot;/&amp;gt;&amp;#10;&quot; typeId=&quot;org.eclipse.debug.core.containerType.project&quot;/&gt;&#10;&lt;container memento=&quot;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot; standalone=&amp;quot;no&amp;quot;?&amp;gt;&amp;#10;&amp;lt;default/&amp;gt;&amp;#10;&quot; typeId=&quot;org.eclipse.debug.core.containerType.default&quot;/&gt;&#10;&lt;container memento=&quot;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot; standalone=&amp;quot;no&amp;quot;?&amp;gt;&amp;#10;&amp;lt;mapping name=&amp;quot;Found Mappings&amp;quot;&amp;gt;&amp;#10;&amp;lt;mapEntry memento=&amp;quot;&amp;amp;lt;?xml version=&amp;amp;quot;1.0&amp;amp;quot; encoding=&amp;amp;quot;UTF-8&amp;amp;quot; standalone=&amp;amp;quot;no&amp;amp;quot;?&amp;amp;gt;&amp;amp;#10;&amp;amp;lt;mapEntry backendPath=&amp;amp;quot;../src/independent&amp;amp;quot; localPath=&amp;amp;quot;/home/miru/programming/embedded/rodos_info8/rodos/src/independent&amp;amp;quot;/&amp;amp;gt;&amp;amp;#10;&amp;quot;/&amp;gt;&amp;#10;&amp;lt;/mapping&amp;gt;&amp;#10;&quot; typeId=&quot;org.eclipse.cdt.debug.core.containerType.mapping&quot;/&gt;&#10;&lt;/sourceContainers&gt;&#10;&lt;/sourceLookupDirector&gt;&#10;"/>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+</listAttribute>
+<stringAttribute key="saved_expressions&lt;seperator&gt;Unknown" value="20002800,0x20002800,0x2001ffa4,0x20002588,0x0800c4d4,0x20002924,0x2001ffff,0x2001fffe,0x2001fffc,0x20002538,0x800c534,0x2000258c,0x200028c8,0x2000116c,0x200010fc"/>
+</launchConfiguration>

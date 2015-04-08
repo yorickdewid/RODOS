@@ -1,0 +1,30 @@
+# Check whether environment has been set
+if [ -z $RODOS_ROOT ]; then
+   # Environment is not set
+   source `dirname $0`/print_no_envs_warning
+fi  
+
+# Set variables to source and include files, set compiler flags
+source ${RODOS_MAKES}/freertos-set-vars
+
+# 1. Compile all FreeRTOS files with C-compiler and move them to the libs-folder
+cd ${FREERTOS_LIB}
+for FRTOS_SRC in ${LIB_SRCS}
+do
+  cd ${FRTOS_SRC}
+  #echo "Working directory is now `pwd`"
+  #echo "${CC} ${CFLAGS} ${LIB_INCLUDES} ${FRTOS_SRC}/*.c  -c"
+  ${CC} ${CFLAGS} ${LIB_INCLUDES} ${FRTOS_SRC}/*.c  -c
+  mv *.o ${RODOS_LIBS} 
+done
+
+
+# 2. "generic-lib" compiles:
+#    - all RODOS .cpp files
+#    - all .cpp files of "MY_SRCS" -> there are none in FreeRTOS
+#    - all .cpp and .s/.S files of "MY_HW_SRCS" -> there are none in FreeRTOS
+#    and creates library
+echo "Compile generic-lib..."
+source ${RODOS_MAKES}/generic-lib
+
+source ${RODOS_MAKES}/check_rodos_support

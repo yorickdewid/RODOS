@@ -1,0 +1,13 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+\rm -rf  ${RODOS_TO_LINK}
+mkdir  ${RODOS_TO_LINK}
+mkdir  ${RODOS_TO_LINK}/single_files
+
+
+
+
+

@@ -1,0 +1,19 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+
+${CXX} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES} *.cpp -c 
+${AR} -r  ${RODOS_LIBS}/${ARCH}/librodos.a *.o
+\rm *.o
+
+#echo " -----------   matlib  -----------------"
+#cd matlib
+#source doit
+#cd ..
+
+echo " -----------   filesystem  ---------------"
+cd filesystem
+source doit-raspberrypi
+cd ..

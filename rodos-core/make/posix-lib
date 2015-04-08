@@ -1,0 +1,16 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+echo "RODOS-warning: this posix implemtnation has no prioceling and no disable-scheduling"
+
+source ${RODOS_MAKES}/posix-set-vars
+
+source ${RODOS_MAKES}/generic-lib
+
+source ${RODOS_MAKES}/check_rodos_support
+cd $RODOS_SUPPORT_LIBS
+doit-posix
+
+

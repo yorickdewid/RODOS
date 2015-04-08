@@ -1,0 +1,20 @@
+
+
+rm -rf libs/o 
+rm -f */*/*.o */*.o *.o
+rm -f */tst
+rm -f */*/tst* */*/*img
+rm -f */*/*/tst*
+rm -f */*/lib*.a
+rm -f support_programs/network
+rm -f support_programs/network_silent
+rm -f support_programs/network_reporter
+
+rm -if temp* */temp* */*/temp* */*/*/temp*
+
+rm -rf libs/*
+# clean_components
+
+cd doc
+./clean
+cd ..

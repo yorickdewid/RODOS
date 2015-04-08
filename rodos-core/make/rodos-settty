@@ -1,0 +1,16 @@
+
+if [ $# -ne 1 ]
+then
+  echo "Usage: as parameter the  tty from"
+  ls -l /dev/serial/by-id | grep FTDI 
+  exit 1
+fi
+
+
+#stty -F /dev/ttyUSB3 115200 clocal cread cs8 -cstopb -parenb
+#cat /dev/ttyUSB3
+
+stty -F /dev/$1 115200 clocal cread cs8 -cstopb -parenb
+cat /dev/$1
+
+

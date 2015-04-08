@@ -1,0 +1,56 @@
+
+PRINTF shall not print
+It shall prepare a monitor message like in the tutorial/monitordistributed
+It shall get all parameter from stack (like the yprintf) an serialize them in the monitor message.
+At the end it send the report with ID PRINTFMSG
+
+To Identify die different printfs we use a pointer to the format string. 
+This will be a unique id, because each string has its own address.
+As first parameter we send this pointer (used as ID).
+
+To do this, take a modified version of yprintf, this modified
+version takes parameter according to the format (char, long, long long) etc
+from the stack and send them without formatting as monitor message.
+
+
+The Receiver (like tutorial/monitoringdistributed/printer.cpp):
+The Receiver gets a message which the first parameter is the pointer
+to the format string. In the simplest way both sender and receiver are in the
+same node and therefore the receiver can use the pointer to format the output.
+The Formatter shall get the parameter to print from the
+monitor messaes instead of from the stack.
+Then it shall print like the normal printf.
+
+When using downlink to transmit the messages we have
+to have on the EGSE a list of all format strings with their corresponding
+address. We shall not send the format string just the ID, which the EGSE can
+use to format the output using a minimal downlink band width.
+
+To run the tutorial use:
+linux-executable *.cpp
+
+PROGRAM
+monitorprintf.h and monitorprintf.cpp
+This is define MonitorPrintf class which contain mechanism for 
+sending and receiving format string and variable list.
+
+To print something use 'reportf'
+void reportf(const char* fmt, ...) function is use for printing something 
+to the monitor message.
+
+It send format string via MonitoringMsg object. 
+static MonitoringMsg monitoring;
+
+sender.cpp
+This program is test program using 'reportf' to print a format string over 
+monitoringMsg object.
+
+printer.cpp
+This program print out the formatted string retrieve from 
+the monitoringMsg object on to the screen.
+
+NOTE
+Because the fmt string is sent only by a pointer.
+So if sender and printer is in different node, the program will not work.
+The predefine format string need to be implemented.
+To do that, please derive the MonitorPrintf class and add your own mechanism. 

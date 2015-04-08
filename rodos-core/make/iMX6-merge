@@ -1,0 +1,30 @@
+#!/bin/bash
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi
+
+source ${RODOS_MAKES}/console_colors
+
+# Error checking
+if [ $# -lt 1 ]; then
+	echo $RED_BOLD"Wrong arguments!"
+	echo $RED_BOLD"arg[0] -> number of images to merge" $RESET
+	exit;
+fi
+
+case $1 in
+	1) 
+	   BIN_FILES="cpu0/cpu0.bin";;
+	2) 
+	   BIN_FILES="cpu0/cpu0.bin cpu1/cpu1.bin";;
+	3) 
+	   BIN_FILES="cpu0/cpu0.bin cpu1/cpu1.bin cpu2/cpu2.bin";;
+	4) 
+	   BIN_FILES="cpu0/cpu0.bin cpu1/cpu1.bin cpu2/cpu2.bin cpu3/cpu3.bin";;
+esac
+
+cd iMX6
+rm iMX6.bin
+# Converting the final image of the program to one single bin file
+echo $YELLOW_BOLD"Converting '${BIN_FILES}' to single bin file..." $RESET
+cat $BIN_FILES > iMX6.bin

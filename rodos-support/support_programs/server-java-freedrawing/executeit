@@ -1,0 +1,7 @@
+
+#!/bin/bash
+
+doit
+
+java -jar tst_rodosgui.jar 
+

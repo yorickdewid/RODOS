@@ -1,0 +1,38 @@
+#!/bin/bash
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi
+
+# Create project directory
+if [ -d "iMX6" ]; then
+	\rm -rf iMX6/cpu2
+	mkdir iMX6/cpu2
+else
+	mkdir iMX6
+	# Create sub-directory for current CPU ID
+	mkdir iMX6/cpu2
+fi
+
+# Setting environment
+source ${RODOS_MAKES}/iMX6-set-vars
+source ${RODOS_MAKES}/console_colors
+
+# Compile target file ******#
+echo $GREEN_BOLD"Compiling target file for cpu2:" $*
+${CXX_COMP} ${CPU_FLAG} ${CXX_FLAGS} -DCPU2 ${INCLUDES} -c $*
+#***************************#	
+
+# Linking file *************#
+echo $BLUE_BOLD"Linking target file:            "$*" -> cpu2.elf"
+${CXX_COMP} -T${CPU2_SCRIPT} ${LINKER_OPTIONS} -L${LINKER_LIB_PATH} -o cpu2.elf *.o ${LINKER_LIB_INC}
+#***************************#
+
+# Converting the image *****#
+echo $RED_BOLD"Converting:                     cpu2.elf -> cpu2.bin (binary) " $RESET
+${OBJCOPY} -O binary cpu2.elf cpu2.bin
+#***************************#
+
+# Move compiled files ******#
+mv *.o *.elf *.bin iMX6/cpu2
+\rm -f *.o *.elf *.bin
+#***************************#

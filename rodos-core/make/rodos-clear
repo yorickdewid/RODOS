@@ -1,0 +1,46 @@
+#!/bin/bash
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+cd ${RODOS_ROOT}/..
+
+echo -n "occupied disc: "
+du -sh .
+# save size before deletions
+SIZE_B=`du -sk . | cut -f 1 | head -n 1`
+
+# delete *.o *.out tst *.elf *.bin *.hex *.img and temp files from the tree
+CLEAR_LIST=`find . -type f \
+  | grep -v svn \
+  | grep -v git \
+  | grep -E "\.o$|\.out$|tst$|tst-|tst_|\.elf$|\.bin$|\.hex$|\.img$|temp$"`
+
+rm -rf $CLEAR_LIST
+rm -rf libs/*
+rm -rf Debug*
+
+rm -f support_programs/network
+rm -f support_programs/network_silent
+rm -f support_programs/network_reporter
+
+
+clear-components
+
+if [ -d ${RODOS_DOC} ]; then
+  cd ${RODOS_DOC}
+  ./clean
+fi
+
+cd ${RODOS_ROOT}
+
+echo -n "after clear occupied disc: "
+du -sh .
+
+# save size after deletions
+SIZE_A=`du -sk . | cut -f 1 | head -n 1`
+SIZE_D=`expr ${SIZE_B} - ${SIZE_A}`
+
+echo "${SIZE_D}k cleared"
+

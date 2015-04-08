@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+INTERFACE="ttyUSB0"
+else
+INTERFACE=$1
+fi
+
+echo -n -e "?" > /dev/${INTERFACE}
+#usleep 100000
+sleep 0.1
+echo -n -e "Synchronized\r\n" > /dev/${INTERFACE}
+#usleep 100000
+sleep 0.1
+echo -n -e "12000\r\n" > /dev/${INTERFACE}
+#usleep 100000
+sleep 0.1
+echo -n -e "U 23130\r\n" > /dev/${INTERFACE}
+#usleep 100000
+sleep 0.1
+echo -n -e "G 00000040 A\r\n" > /dev/${INTERFACE}
+
+

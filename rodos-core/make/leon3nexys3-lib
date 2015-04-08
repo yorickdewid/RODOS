@@ -1,0 +1,76 @@
+#! /bin/bash 
+
+# shell gibt fehlermeldung wenn man auf ungesetzte variablen zugreift
+#set -euC
+# falls z.B. a* und nichts mit a anfängt, liefert eine leere liste
+shopt -s nullglob
+
+if [ -z "${RODOS_ROOT}" ]; then
+  source "`dirname $0`/print_no_envs_warning"
+fi
+
+echo "RODOS-warning: this implementation has no rodos namespace"
+
+source ${RODOS_MAKES}/leon3-vars-envs-nexys3
+
+# Check that directory exists:
+cd "${RODOS_ROOT}"
+
+# Make fresh destination directory tree:
+mkdir -p "${RODOS_ARCH_DST}"
+cd "${RODOS_ARCH_DST}"
+
+rm -f  librodos.a
+rm -rf build0
+rm -rf build1
+
+# We ensure that there are no objects with the same name in the bare-metal
+# package and RODOS by placing the resulting objects in two different
+# target directories.
+mkdir build0
+mkdir build1
+
+cd build0
+
+# Compile the library:
+for file in "${RODOS_ARCH_SRC_SUB}"/*.{s,S,cpp} "${RODOS_ARCH_SRC}"/*.{s,S,cpp} ${RODOS_ARCH_SRC}/hal/*.{s,S,cpp}
+do
+  ${CPP_COMP} ${CXXFLAGS} ${MORE_CFLAGS-} ${INCLUDES} -c "$file"
+done
+
+cd ../build1
+
+#for file in "${RODOS_SRC1}"/*.cpp "${RODOS_SRC2}"/*.cpp ${RODOS_SUPPORT_LIBS}/*.cpp ${RODOS_SRC1}/gateway/*.cpp 
+for file in "${RODOS_SRC1}"/*.cpp "${RODOS_SRC2}"/*.cpp ${RODOS_SRC1}/gateway/*.cpp 
+do
+  ${CPP_COMP} ${CXXFLAGS} ${MORE_CFLAGS-} ${INCLUDES} -c "$file"
+done
+
+cd ..
+
+#echo "---------------------- printf "
+#for file in "${RODOS_PRINTF_SRC}"/*.c
+#do
+#  ${C_COMP} ${CFLAGS} ${MORE_CFLAGS-} ${INCLUDES} -c "$file"
+#done
+#echo "----------------------------- "
+
+# Preprocess linker script:
+${CPP_COMP} -DHW_SIMULATOR=0 -x c++ -Wp,-P \
+    ${CXXFLAGS} ${MORE_CFLAGS-} ${INCLUDES} -E \
+    "${RODOS_ARCH_SRC}"/linkerscript.L >| linkerscript.l.new
+test -s linkerscript.l.new
+mv linkerscript.l.new linkerscript.l
+
+${CPP_COMP} -DHW_SIMULATOR=1 -x c++ -Wp,-P \
+    ${CXXFLAGS} ${MORE_CFLAGS-} ${INCLUDES} -E \
+    "${RODOS_ARCH_SRC}"/linkerscript.L >| linkerscript-sim.l.new
+test -s linkerscript-sim.l.new
+mv linkerscript-sim.l.new linkerscript-sim.l
+
+# Move in place:
+
+${AR_EXE} rc librodos.a ./build0/*.o ./build1/*.o
+${RANLIB_EXE} librodos.a
+
+source ${RODOS_MAKES}/check_rodos_support

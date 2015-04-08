@@ -1,0 +1,11 @@
+# Check whether environment has been set
+if [ -z $RODOS_ROOT ]; then
+   source `dirname $0`/print_no_envs_warning
+fi  
+
+# Set path variables needed for compiler and linker
+. ${RODOS_MAKES}/freertos-set-vars
+
+# Use C++ compiler
+#echo "Creating function tst"
+${CPP_COMP} ${CFLAGS} ${CPPFLAGS} ${INCLUDES} ${FIRST_LINK_OBJ} -o tst  ${*} ${LINKFLAGS}

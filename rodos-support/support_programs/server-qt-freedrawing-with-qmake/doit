@@ -1,0 +1,9 @@
+
+qmake -project
+qmake
+make
+
+rm *pro *.o Makefile
+mv server-qt-freedrawing-with-qmake tst
+
+

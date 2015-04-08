@@ -1,0 +1,13 @@
+
+Eine einfache Änderung, die Sie vielleicht vornehmen müssen,
+befindet sich an an der Stelle, an der die Portierung die CPU-ID abfragt.
+Hier lieferte das Entwicklungsboard wohl einfach einen "Dummy-Wert"
+von 0000
+wohingegen die richtige Hardware sich vielleicht als LEON zu erkennen
+gibt.
+
+
+Dateien hw_config.h, hw_config.cpp und reset.S
+In der Datei hw_config.h werden wohl 'magic numbers' für
+verschiedene CPU-IDs definiert. Die Symbole beginnen mit HW_ARCH_LEON...
+

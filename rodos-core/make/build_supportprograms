@@ -1,0 +1,5 @@
+
+cd $RODOS_SUPPORT_PROGS
+doit $1
+
+

@@ -1,0 +1,397 @@
+
+                              RODOS Porting Guide
+                          Andre Bartke <dev@bartke.cc>
+
+This document briefly describes the interfaces that must be implemented when
+porting RODOS to a new hardware platform. The related code should be placed
+in a directory that follows this pattern:
+
+  src/bare-metal/<platform>/
+
+                           Configuration in params.h
+
+There is a number of RODOS-related configuration parameters that define
+hardware limits and behavior of the operating system. The name of this header
+is expected to be params.h and must contain a list of preprocessor directives.
+
+/** Version Number */
+#define OSVERSION "RODOS-PPC405-XUPV2P"
+
+/** Memory for allocation (xmalloc) eg for all stacks ***/
+#ifndef XMALLOC_SIZE
+#define XMALLOC_SIZE                  500000
+#endif
+
+/** default stack size (in bytes) for threads */
+#ifndef DEFAULT_STACKSIZE
+#define DEFAULT_STACKSIZE             10000
+#define SCHEDULER_STACKSIZE DEFAULT_STACKSIZE
+#endif
+
+/** CXXABI maximum number of global constructors. */
+#ifndef MAX_ATEXIT_ENTRIES
+#define MAX_ATEXIT_ENTRIES            64
+#endif /* MAX_ATEXIT_ENTRIES */
+
+/** time interval between timer interrupts in microseconds. */
+#ifndef PARAM_TIMER_INTERVAL
+#define PARAM_TIMER_INTERVAL          10000
+#endif
+
+/*** time for time slice to swtich between threads with same priority ***/
+#define TIME_SLICE_FOR_SAME_PRIORITY  (100*MILLISECONDS)
+
+/** default priority for newly created threads */
+#ifndef DEFAULT_THREAD_PRIORITY
+#define DEFAULT_THREAD_PRIORITY       100
+#endif
+
+/** user threads shall not have a priority higher than this */
+#ifndef MAX_THREAD_PRIORITY
+#define MAX_THREAD_PRIORITY           1000
+#endif
+
+/** high priority levels for priority ceiling  */
+#ifndef NETWORKREADER_PRIORITY
+#define NETWORKREADER_PRIORITY        (MAX_THREAD_PRIORITY + 2)
+#endif
+
+/** high priority levels for priority ceiling  */
+#ifndef CEILING_PRIORITY
+#define CEILING_PRIORITY              (NETWORKREADER_PRIORITY + 1)
+#endif
+
+/** using a network, the maximal number of nodes attached */
+#ifndef MAX_NUMBER_OF_NODES
+#define MAX_NUMBER_OF_NODES           10
+#endif
+
+/** if using network it may have a limit for pakets, eg udp 1500 */
+#ifndef MAX_NETWORK_MESSAGE_LENGTH
+#define MAX_NETWORK_MESSAGE_LENGTH    1300
+#endif
+
+// /*** If using a network: Maximal number of subscribers per node */
+#ifndef MAX_SUBSCRIBERS
+#define MAX_SUBSCRIBERS               60
+#endif
+
+The setting for XMALLOC_SIZE defines how much memory is going to be available
+all together. The whole amount of memory RODOS will consume is static and
+known at compile time. The reserved amount is used by the xmalloc function
+that also allocates every thread's stack defined by DEFAULT_STACKSIZE.
+MAX_ATEXIT_ENTRIES is set as part of the C++ ABI functions. See doc/cxxabi.txt
+and the implementation in src/bare-metal-generic/cxxabi.cpp
+
+The scheduler gets its own stack of the size defined by SCHEDULER_STACKSIZE. On
+the sparc64 port for example we continue to use our initial boot stack
+and therefore can set this value to zero.  Note that we can start with a
+fresh stack every time the scheduler is called since none of its register
+contents needs preserved. This directly implies that on every call to
+__asmSwitchToContext() the scheduler's stack dies which saves us the effort
+of saving supervisor contents.
+
+
+                                   Hostinfos
+
+There are some interfaces to provide information about the host's environment
+at run-time:
+
+  bool getIsHostBigEndian();
+  long getSpeedKiloLoopsPerSecond();
+  const char* getHostCpuArch();
+  const char* getHostBasisOS();
+
+These are self explanetory. getSpeedKiloLoopsPerSecond can be determined by
+the tutorial tutorials/advanced_and_complex/development-tests/cpuspeedtest.cpp
+
+
+                                    Startup
+
+Before we can jump to the kernel's main function, static locals and global
+objects have to be initialized. The necessary functions should be placed
+in hw_specific.cpp:
+
+  void hwInit(); /* may be a stub */
+  long* hwInitContext(long* stack, void* object);
+  void hwResetAndReboot();
+  void sp_partition_yield(); /* stub on bare-metal */
+  void startIdleThread();  /* stub on most bare-metal targets */
+
+The corresponding header file hw_specific.h can be found in
+src/bare-metal-generic/. For every thread
+
+  hwInitContext()
+
+is called to set up the context with certain parameters. The first argument
+to this function is a pointer to the start of the thread's stack and provides
+the basis to compute an appropriate stack pointer. The second argument is the
+thread's object pointer that is passed as a callback to threadStarupWrapper
+It needs to be stored in the register that makes up the first argument on a
+function call.  The startup wrapper begins the thread execution by jumping
+to its run() routine. Thread::run() is a pure virtual that is implemented by
+inherited classes.  Upon exit, hwInitContext() returns a pointer to the newly
+created context. This is usually the address of a C struct containing space
+for a number of registers which is located within the initially allocated
+stack frame.
+
+When this is done, we can safely enter main() that can be found in
+src/independent/main.cpp.
+
+
+                                      Time
+
+A timer will be implemented using an interrupt handler that sums up the passed
+nanoseconds since the last interrupt to a global value. The initialization
+of time and registration of a respective interrupt handler can be done in
+either one of hwInitTime() or Timer::init(). The other one may be left as
+a stub.  The timer interval, that is the time between two consecutive timer
+interrupts, should be settable by calling Timer::setInterval() in a scale
+of microseconds.  It is called with the argument PARAM_TIMER_INTERVAL from
+the RODOS main function right before Timer::init(). The latter should start
+the timer interrupts.
+
+  void hwInitTime();  /* may be a stub */
+  long long unsigned int hwGetNanoseconds();
+  long long unsigned int hwGetAbsoluteNanoseconds();
+  void Timer::init();
+  void Timer::start();
+  void Timer::stop(); void
+  Timer::setInterval(const long long interval);
+
+Based on the number of counted ticks the function hwGetNanoseconds()
+returns the number of passed nanoseconds since the system was booted up. The
+resolution is dependent on the frequency at which the timer operates but
+is scaled to nanoseconds because this is the timing unit RODOS relies on.
+While time events are mostly based on the value returned by this function,
+a pseudo random number generator greatly benefits from increased entropy and
+therefore relies on hwGetAbsoluteNanoseconds() which could add the value of
+an internal real-time clock if present. Otherwise, it just returns the same
+value as hwGetNanoseconds().
+
+
+                                    Watchdog
+
+If the bsp supports a watchdog that hard resets the system when triggering
+fails or stops the two corresponding functions shall be implemented:
+
+  void hwInitWatchdog(long intervalMilliSeconds);
+  void hwTriggerWatchdog();
+
+The first one initializes the watchdog with a desired interval while the
+second is used to trigger the 'I am alive' status to the watchdog.
+
+
+                               Context Switching
+
+These two routines have to be implemented for every new hardware platform. The
+routines might be invoked very frequently which makes it a good idea to
+optimize them for a minimal number of instructions.
+
+  void __asmSwitchToContext(long* context);
+  void __asmSaveContextAndCallScheduler();
+
+In a multitasking environment there has to be a facility to switch
+the execution context which, on RODOS, implies the switch to another
+thread. Responsible routines are most certainly implemented in assembly since
+we need to directly access and modify register contents. But before we can
+do a switch, we have to pass control to a thread in the first place. This
+is done by the scheduler with a call to the
+
+  __asmSwitchToContext()
+
+routine. Here, supervisor mode is left in favor of the user mode, saved
+registers are restored and finally a jump to the old program counter is
+made. As mentioned earlier, when the thread is entered the first time it
+initially jumps to the threadStartupWrapper(), that calls the implemented
+virtual Thread::run().
+
+It should be explained at this point why we use top-level wrapper functions as
+intermediaries in order to interact with C++ members. As context switching is
+most likely implemented in assembly, it is not possible to use a non-static
+C++ member function. Those are meaningless without an instance to call them
+on. The callback function is declared 'extern "C"' to get correct calling
+conventions through C linkage and avoid C++ name mangling.  This is also the
+reason why hwInitContext() is passed a 'void *' object pointer that in turn
+is passed to the callback function. It provides the Thread object instance
+that is necessary to call the member method we are actually aiming for.
+
+Context switches can be voluntary, initiated by a call to Thread::yield()
+from the currently executed thread. This method invokes a direct call to a
+routine usually implemented in assembly called
+
+  __asmSaveContextAndCallScheduler()
+
+In order to pass control to the scheduler one usually has to switch back to
+privileged mode which is why this routine issues a system call on sparc64.
+In case of a voluntary context switch we arrive in the appropriate routines
+similarly to a normal function call. Therefore only those registers need to be
+saved that needs preserving across function calls. After everything is stored
+to a respective context structure, we place the context pointer from the thread
+we are switching from as the first argument and jump to the schedulerWrapper().
+
+Involuntary context switching, known as pre-emption, describes a process
+where control is withdrawn from a thread without further notice. This is the
+core concept of real-time, that it is not possible for a thread to occupy
+the system indefinitely. After a previously defined interval, the context
+is forcibly switched. The procedure is highly architecture dependent as
+the complete register file, including the current processor state, needs to
+be preserved. Even if unimportant for the world outside of the bare-metal
+target, for consistency reasons the internal entry point for this routine
+shall be named
+
+  __asmSaveContext
+
+Upon exit, the function will also jump to the schedulerWrapper() in supervisor
+mode. It is important that we only want to call the scheduler from the timer
+ISR when the variable isSchedulingEnabled is set and the current time is
+greater than timeToTryAgainToSchedule.
+
+
+                                 Low Level I/O
+
+However minimal necessary interfaces are laid out, we need at least some
+possibility to provide feedback usually realized through UART. The high level
+function xprintf from the RODOS API for example, translates to putchar() on a
+lower level. In turn, putchar() may translate to the write() system call which
+is the way it is realized on the sparc64 port. puts() shall be provided in
+a similar fashion, the prototypes shall be available in the header hw_stdlib.h
+
+  int putchar(int character);
+  int puts(const char *str);
+
+Although not necessary for a working port, it makes sense to implement the
+the other direction for communication purposes.
+
+  char getcharNoWait();
+  bool isCharReady();
+  char* getsNoWait();
+  void activateTopicCharInput();
+
+I/O device drivers are expected to follow the naming convention hw_<DEVICE>.cpp
+and to be placed in the bare-metal's root directory.  The hw_uart.cpp file
+is expected to provide at least:
+
+  void FFLUSH();
+
+The hw_udp.h file shall provide the classes UDPReceiver and UDPTransmitter
+at least as dummies.
+
+
+                              C++ Runtime Support
+
+In contrast to C, there are a few more things that have to be taken
+into account when writing an operating system in C++. There are a lot of
+language features that require no special attention like classes or virtual
+functions. Other features like exceptions can be disabled by compiler flags
+if not needed. Some parts of the language however are mandatory and assume
+a special run-time support to be present, as we will see in the following
+sections. For full C++ run-time support, the libraries \ttline{libgcc}
+and \ttline{libsupc++} would be necessary on the target platform. We will
+however only provide a small, essential subset.
+
+In a hosted environment g++ is linking against crt1.o short for 'C run-time'.
+Basically it contains the startup and shutdown code that has to run before
+and after the main() function is invoked. This code also includes the
+symbol _start that becomes the entry point of the executable. When a kernel
+then loads this binary, the .text, .data and .bss sections are set up and
+arguments are pushed to the stack. The entry point _start is called and a
+C-library takes care about the environment before calling the actual main()
+function. Since we operate in kernel land, ergo a freestanding environment,
+nothing of this will magically happen in the background, but we have to
+take care of it ourselves. The first thing to do is to disable this default
+behavior with the -nostartfiles compiler flag.
+
+Run-Time Type Information shall be disabled by passing -fno-rtti to gcc.
+We also do not intend to provide run-time support for exception handling. The
+compiler flag to disable exceptions is \ttline{-fno-exceptions}.
+
+                              Object Construction
+
+Since we have already established the fact that there is no C run-time that
+handles the function prologue for us, we also have to consider that local
+static and global objects are not getting instantiated on their own. For
+every global object in our kernel we have to call its constructor before we
+can use respective member functions. GCC places a list of these pointers in
+a section called .ctors at link time. We have to collect this information at
+run-time and make calls to these constructor function pointers. The gnu-ld
+manuals specify a sequence for the linker script in order to emit this list
+in a certain structure. The adapted version is shown in figure ctors and is
+placed in the .rodata (read-only data) section.
+
+  __CTOR_LIST__ = .;
+  QUAD((__CTOR_END__ - __CTOR_LIST__) / 8 - 2)
+  *(.ctors)
+  QUAD(0)
+  __CTOR_END__ = .;
+
+We are operating in a 64-bit environment where pointers are 8-bytes in
+size. The examples from the manuals are intended for a 32-bit environment. We
+had to replace all 4-byte LONG() words with 8-byte QUAD() (extended)
+words. The same applies to the division by eight. The first element of
+the list contains the number of constructors, then follows a list of the
+function pointers and the last item is a zero. In order to count the number
+of constructors between the __CTOR_LIST__ and __CTOR_END__ symbols, we have
+to divide the number of bytes in between by eight and subtract two for the
+first and last item of the list.
+
+If the order in which these constructors are executed is of importance, one
+could use the GNU C++ initialization priorities and put *(SORT_BY_NAME(.ctors))
+instead of *(.ctors) in the linker script.
+
+To actually call the constructors we need to acquire the stored information
+from this structure. The number of entries can be found through the
+__CTOR_LIST__ symbol, which when incremented, has the address of the function
+pointer of the first constructor. We then consecutively call constructor
+functions until the just acquired number is met. An example is shown below,
+where \ttline{__CTOR_LIST__} is defined as an external function pointer.
+
+  void (**c)(void) = &__CTOR_LIST__;    // get a pointer to the list
+  uint64_t nentries = *(uint64_t *)c++; // first entry is the number of
+  ctors while(nentries--)
+    (*c++)();                           // call constructors
+
+
+                          Application Binary Interface
+
+We follow the Itanium C++ ABI as described in doc/cxxabi.txt. Each port
+shall provide an atomic compare and exchange (atomic_cmpxchg) as described in
+doc/atomic_ops.txt.  The guard type shall be provided through hw_datatypes.h
+with the respective register size in the respective namespace:
+
+  namespace __cxxabiv1 {
+    typedef int64_t __guard;
+  }
+
+
+                                 Vague Linkage
+
+This section needs to be taken into account when writing the linker script.
+Normally, when linking, sections with the same name are combined in a
+single section. We are also used to the fact that the linker will complain
+if there are multiple definitions of the same symbol. The concept of vague
+linkage allows duplicate occurrences of such constructs across multiple
+object files by defining these sections with the link once type.  This is
+necessary since features like templates may instantiate the same symbol more
+than once. In order to allow multiple definitions, the symbols are defined
+as weak. For any template expansion, these are then placed in individual
+.gnu.linkonce.* sections. At link time, if there are sections with the same
+name that are starting with .gnu.linkonce.*, all but one of the definitions
+are discarded. For this to work, we need to specify special sections in the
+linker script as shown below:
+
+  *(.gnu.linkonce.t*)
+  *(.gnu.linkonce.r*)
+  *(.gnu.linkonce.d*)
+  *(.gnu.linkonce.b*)
+
+A similar process can be found with virtual functions. The compiler will
+define weak symbols for all objects that include the class header file,
+but later on, only generates a vtable in those that define these functions.
+
+Generally speaking, it is a concept to remove duplicate code that results
+from various C++ features. It is called vague because there is no standard
+of doing this sort of thing. The linkonce implementation of the GNU linker is
+just a variation of this concept. Microsoft introduced a similar implementation
+where the object's section is called 'COMDAT'.
+

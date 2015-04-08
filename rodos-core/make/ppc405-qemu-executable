@@ -1,0 +1,19 @@
+#! /bin/bash
+
+# written by Andre Bartke <dev@bartke.cc>
+# Adapted from linux/leon2/ocn versions.
+
+shopt -s nullglob
+
+if [ -z "$RODOS_ROOT" ]; then
+  source "`dirname $0`/print_no_envs_warning"
+fi
+
+source "${RODOS_MAKES}/ppc405-qemu-set-vars"
+
+#echo ""
+#echo "-- Creating kernel image"
+#echo " Applications: ${@%.*}"
+${CXX} ${CXXFLAGS} ${INCLUDES} $@ ${CXX_LINKER_FLAGS} -o tst.elf || exit
+${OBJCOPY} -O binary tst.elf tst
+#echo "...done."

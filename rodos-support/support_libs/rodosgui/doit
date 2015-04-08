@@ -1,0 +1,7 @@
+
+\rm -f *.o
+${CPP_COMP} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES}  *.cpp -c 
+
+ar -r  ${RODOS_LIBS}/${ARCH}/librodos.a *.o
+\rm -f *.o
+

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+ARCH=raspberrypi
+
+export RODOS_SRC1="${RODOS_ROOT}/src/bare-metal-generic"
+export RODOS_SRC2="${RODOS_ROOT}/src/independent"
+export RODOS_SRC3="${RODOS_ROOT}/src/independent/gateway"
+
+export RODOS_ARCH_SRC1="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+
+export INCLUDES=" \
+    -I. \
+    -I${RODOS_API} \
+    -I${RODOS_SRC1} \
+    -I${RODOS_SRC2} \
+    -I${RODOS_SRC3} \
+    -I${RODOS_ARCH_SRC1} \
+    -I${RODOS_ARCH_SRC1}/startup/ \
+    -I${RODOS_ARCH_SRC1}/hal/ \
+    -I${RODOS_SUPPORT_LIBS} \
+    ${APP_INCLUDES}"
+
+export CFLAGS_BASICS=" -O2 -Wall -g0 "
+export HWCFLAGS=" -mcpu=arm1176jzf-s -mfloat-abi=softfp -mfpu=vfp "
+#export HWCFLAGS=" -mcpu=arm1176jzf-s -mfloat-abi=soft"
+export CFLAGS=" ${CFLAGS_BASICS} ${HWCFLAGS} "
+
+export CPPFLAGS="-fno-rtti -fno-exceptions "
+
+export LINKFLAGS=" -T${RODOS_ARCH_SRC1}/scripts/linkerscript.ld -nostartfiles -L${RODOS_LIBS}/${ARCH} -lrodos " 
+
+# set PATH to whereever your ARM compiler is located; usually you should
+# have symlinks in /usr/bin so this would work out-of-the box
+CXX=arm-none-eabi-g++
+CC=arm-none-eabi-gcc
+AS=arm-none-eabi-as
+AR=arm-none-eabi-ar
+OBJCOPY=arm-none-eabi-objcopy
+OBJDUMP=arm-none-eabi-objdump
+

@@ -1,0 +1,50 @@
+#! /bin/bash -x
+
+#set -euC
+set -eC
+shopt -s nullglob
+
+if [ -z "${RODOS_ROOT}" ]; then
+  source "`dirname $0`/print_no_envs_warning"
+fi
+
+source "${RODOS_MAKES}/virtex4-set-vars"
+
+# Check that directory exists:
+cd "${RODOS_ROOT}"
+
+# Make fresh destination directory tree:
+mkdir -p "${RODOS_ARCH_DST}"
+cd "${RODOS_ARCH_DST}"
+
+#rm -f  crt.o
+rm -f  librodos.a
+rm -rf compile
+
+mkdir compile
+cd compile
+
+# Compile the library:
+for file in "${RODOS_SRC1}"/*.cpp "${RODOS_SRC2}"/*.cpp "${RODOS_SRC3}"/*.cpp
+do
+  ${CPP_COMP} ${CXXFLAGS} ${MORE_CFLAGS-} ${INCLUDES} -c "$file"
+done
+
+#for file in "${RODOS_PRINTF_SRC}"/*.c
+#do
+#  ${C_COMP} ${CFLAGS} ${MORE_CFLAGS-} ${INCLUDES} -c "$file"
+#done
+
+## Preprocess linker script:
+#${CPP_COMP} -DHW_SIMULATOR=0 -x c++ -Wp,-P \
+#    ${CXXFLAGS} ${MORE_CFLAGS-} ${INCLUDES} -E \
+#    "${RODOS_ARCH_SRC}"/linkerscript.L >| linkerscript.l.new
+#test -s linkerscript.l.new
+#mv linkerscript.l.new linkerscript.l
+
+# Move in place:
+#mv ./crt.o ../
+${AR_EXE} rc ../librodos.a ./*.o
+${RANLIB_EXE} ../librodos.a
+
+source "${RODOS_MAKES}/check_rodos_support"

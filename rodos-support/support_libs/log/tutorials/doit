@@ -1,0 +1,102 @@
+#!/bin/sh
+# ToDo: compile log missing / nexys3 broken
+
+echo "========================================================="
+echo "= RODOS logging framework tutorial                      ="
+echo "= Select configuration:                                 ="
+echo "= (1) Linux-Linux UDP (ConsoleAppender)                 ="
+echo "= (2) Linux-Linux UART-ttyS0 (ConsoleAppender)          ="
+echo "= (3) Nexys3/LEON3-Linux UART-ttyUSB0 (ConsoleAppender) ="
+echo "= (4) Linux-Linux UDP (MaskAppender)                    ="
+echo "========================================================="
+
+nexys3linuxttyUSB0() {
+	echo "*** Executing linux-lib..."
+	linux-lib
+	echo "*** Executing leon3nexys3-lib..."
+	leon3nexys3-lib
+	echo "*** Compiling logging framework/tutorial..."
+	pushd .
+	cd ${RODOS_ROOT}/support_libs/log
+	${RODOS_ROOT}/support_libs/log/doit
+	popd
+	cp ${RODOS_ROOT}/support_libs/log/liblog.a .
+	linux-executable  gw-forward-all-nexys3-linux-ttyUSB0.cpp example_topics.cpp groundstationlogger_console.cpp  -L. -llog -o tst-ground
+	pushd .
+	cd ${RODOS_ROOT}/support_libs/log
+	${RODOS_ROOT}/support_libs/log/doit-leon
+	popd
+	cp ${RODOS_ROOT}/support_libs/log/liblog.a ./liblog-leon.a
+	leon3nexys3-executable  gw-forward-all-nexys3-linux-ttyUSB0.cpp example_topics.cpp batteryinterface.cpp powercontrol.cpp -L. -llog-leon -o tst-sat
+	return
+}
+
+linuxlinuxttyS0() {
+	echo "*** Executing linux-lib..."
+	linux-lib
+	echo "*** Compiling logging framework/tutorial..."
+	pushd .
+	cd ${RODOS_ROOT}/support_libs/log
+	${RODOS_ROOT}/support_libs/log/doit
+	popd
+	cp ${RODOS_ROOT}/support_libs/log/liblog.a .
+	linux-executable  gw-forward-all-linux-linux-ttyS0.cpp example_topics.cpp groundstationlogger_console.cpp  -L. -llog -o tst-ground
+	linux-executable  gw-forward-all-linux-linux-ttyS0.cpp example_topics.cpp batteryinterface.cpp powercontrol.cpp -L. -llog -o tst-sat
+	return
+}
+
+linuxlinuxudp() {
+	echo "*** Executing linux-lib..."
+	linux-lib
+	echo "*** Compiling logging framework/tutorial..."	
+	pushd .
+	cd ${RODOS_ROOT}/support_libs/log
+	${RODOS_ROOT}/support_libs/log/doit
+	popd
+	cp ${RODOS_ROOT}/support_libs/log/liblog.a .
+	linux-executable  gw-forward-all-linux-linux-udp.cpp example_topics.cpp groundstationlogger_console.cpp -L. -llog -o tst-ground
+	linux-executable  gw-forward-all-linux-linux-udp.cpp example_topics.cpp batteryinterface.cpp powercontrol.cpp -L. -llog -o tst-sat
+	return
+}
+
+linuxlinuxudpmask() {
+	echo "*** Executing linux-lib..."
+	linux-lib
+	echo "*** Compiling logging framework/tutorial..."	
+	pushd .
+	cd ${RODOS_ROOT}/support_libs/log
+	${RODOS_ROOT}/support_libs/log/doit
+	popd
+	cp ${RODOS_ROOT}/support_libs/log/liblog.a .
+	linux-executable  gw-forward-all-linux-linux-udp.cpp example_topics.cpp groundstationlogger_mask.cpp MaskAppender.cpp  -L. -llog -o tst-ground
+	linux-executable  gw-forward-all-linux-linux-udp.cpp example_topics.cpp batteryinterface.cpp powercontrol.cpp -L. -llog -o tst-sat
+	return
+}
+
+selection(){
+	read -s -N 1 sel
+	case $sel in
+		1) 
+			echo "*** Linux-Linux UDP (ConsoleAppender) selected"
+			linuxlinuxudp
+			;;
+		2) 
+			echo "*** Linux-Linux UART-ttyS0 (ConsoleAppender) selected"
+			linuxlinuxttyS0
+			;;
+		3) 
+			echo "*** Nexys3_LEON3-Linux UART-ttyUSB0 (ConsoleAppender) selected"
+			nexys3linuxttyUSB0
+			;;
+	    4)
+	    	echo "*** Linux-Linux UDP (MaskAppender) selected"
+	    	linuxlinuxudpmask
+	    	;;
+		*) 
+			echo "doit: wrong input. Try again - (1/2/3/4)?"
+			selection
+			;;
+	esac
+}
+
+selection

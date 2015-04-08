@@ -1,0 +1,3 @@
+reset halt
+flash write_image erase tst.bin 0x08000000
+reset

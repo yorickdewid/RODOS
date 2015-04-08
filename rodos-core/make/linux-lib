@@ -1,0 +1,14 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/linux-set-vars
+
+source ${RODOS_MAKES}/generic-lib
+
+source ${RODOS_MAKES}/check_rodos_support
+echo ""
+echo "Building support-libs ..."
+build_supportlibs
+

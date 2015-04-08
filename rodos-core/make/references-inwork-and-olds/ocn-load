@@ -1,0 +1,8 @@
+echo "1. start Xilinx SDK"
+echo "2. start FPGA programming wizard under \"Xilinx Tools -> Program FPGA\""
+echo "3. choose \"dlr_board\" in hardware platform dialog"
+echo "4. klick \"Program\""
+echo "5. go to XMD Console on bottom of main window"
+echo "6. type \"connect ppc hw\""
+echo "7. type \"dow /PATH_TO_YOUR_PPC_ELF_FILE/PPC_PROGRAM.elf\""
+echo "8. type \"run\" to start the program"

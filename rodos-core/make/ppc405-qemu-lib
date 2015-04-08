@@ -1,0 +1,80 @@
+#! /bin/bash
+
+# written by Andre Bartke <dev@bartke.cc>
+# Adapted from linux/leon2/ocn versions.
+
+# do not print error if wildcards are not found
+shopt -s nullglob
+
+# check environment
+if [ -z "${RODOS_ROOT}" ]; then
+  source "`dirname $0`/print_no_envs_warning"
+fi
+
+source "${RODOS_MAKES}/ppc405-qemu-set-vars"
+
+cd "${RODOS_ROOT}"
+
+# Create the directory tree
+mkdir -p "${RODOS_ARCH_DST}"
+cd "${RODOS_ARCH_DST}"
+
+rm -f  librodos.a
+rm -rf build0
+rm -rf build1
+rm -f $RODOS_ARCH_DST/*
+
+# We ensure that there are no objects with the same name in the bare-metal
+# package and RODOS by placing the resulting objects in two different
+# target directories.
+mkdir build0
+mkdir build1
+
+cd build0
+
+#echo "-- Creating bios file"
+$AS $RODOS_ARCH_SRC/boot/bsp-${BSP}/ppc405_rom.S -o $RODOS_ARCH_DST/ppc405_rom.o
+$LD -T $RODOS_ARCH_SRC/boot/bsp-${BSP}/ppc405_rom.ld $RODOS_ARCH_DST/ppc405_rom.o -o $RODOS_ARCH_DST/ppc405_rom.elf
+$OBJCOPY -O binary $RODOS_ARCH_DST/ppc405_rom.elf $RODOS_ARCH_DST/ppc405_rom.bin
+#echo "...done."
+
+#echo "-- Creating objects"
+
+ASM_SRCS=`find $RODOS_ARCH_SRC -name '*.s' -o -name '*.S'`
+for file in $ASM_SRCS; do
+  #echo " ASM     `basename ${file} .s`.o"
+  ${CC} ${CWARNINGS} ${CFLAGS} ${INCLUDES} -D__ASM__ -c $file || exit
+done
+
+C_SRCS=`find $RODOS_ARCH_SRC -name '*.c'`
+for file in $C_SRCS; do
+  #echo " CC      `basename ${file} .c`.o"
+  ${CC} ${CWARNINGS} ${CFLAGS} ${INCLUDES} -c $file || exit
+done
+
+CXX_SRCS=`find $RODOS_ARCH_SRC -name '*.cpp'`
+for file in $CXX_SRCS; do
+  #echo " CXX     `basename ${file} .cpp`.o"
+  ${CXX} ${CXXFLAGS} ${INCLUDES} -c $file || exit
+done
+
+cd ../build1
+
+#for file in "${RODOS_SRC1}"/*.cpp "${RODOS_SRC2}"/*.cpp "${RODOS_SRC3}"/*.cpp "${RODOS_SUPPORT_LIBS}"/*.cpp; do
+for file in "${RODOS_SRC1}"/*.cpp "${RODOS_SRC2}"/*.cpp "${RODOS_SRC3}"/*.cpp; do
+  #echo " CXX     `basename ${file} .cpp`.o"
+  ${CXX} ${CXXFLAGS} ${INCLUDES} -c "$file"
+done
+
+cd ..
+
+# Create lib from obj-files and move it in place
+#echo ""
+#echo "-- Creating librodos.a"
+
+${AR} rc librodos.a ./build0/*.o ./build1/*.o
+${RANLIB} librodos.a
+#echo "...done."
+
+source ${RODOS_MAKES}/check_rodos_support
+

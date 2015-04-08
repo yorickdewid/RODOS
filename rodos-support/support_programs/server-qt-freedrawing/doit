@@ -1,0 +1,12 @@
+
+
+
+export QT_INCLUDES=" -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I. "
+export QT_LIBS=" -L/usr/lib -lQtGui -lQtCore -lpthread "
+
+export INCLUDES="${QT_INCLUDES}  -I../ -I../udpinterface"
+export EXTRA_SOURCES="../udpinterface/udp_common.cpp"
+
+g++ -g -o tst ${INCLUDES} ${EXTRA_SOURCES} *.cpp  ${QT_LIBS}
+
+

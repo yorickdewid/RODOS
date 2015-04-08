@@ -1,0 +1,5 @@
+
+cd rodos-core/
+source make/rodosenvs 
+cd ..
+

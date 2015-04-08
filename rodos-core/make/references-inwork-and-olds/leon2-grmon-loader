@@ -1,0 +1,41 @@
+echo "Beispiel von grmon commandso: "
+echo "note: pinrtf von uart 1, baurate 38400 "
+echo "serial config: make/config-stty"
+echo "printf lesen: cat /dev/ttyS0"
+echo
+echo
+echo
+echo
+
+
+echo " in linker script wird alles auf adr 0 gelinkt "
+echo "daher erase 0 & run 0 "
+echo
+echo
+echo "niemals waehrend des ladens abbrechen, sonst "
+echo "   nichteimal auschalten hilft! Geisler anrufen!!!!!!"
+echo
+echo
+
+echo "grlib> flash unlock all"
+echo "grlib> flash erase 0"
+echo "Erase in progress"
+echo "Block @ 0x00000000 : code = 0x80  OK "
+echo "Erase complete"
+echo "grlib> flash load tst"
+echo "section: .boot at 0x0, size 5512 bytes"
+echo "section: .text at 0x1588, size 23088 bytes"
+echo "section: .data at 0x6fb8, size 4424 bytes"
+echo "total size: 33024 bytes (29.5 kbit/s)"
+echo "read 240 symbols"
+echo "entry point: 0x00000000"
+echo "grlib> flash lock all"
+echo "grlib> verify tst"
+echo "section: .boot at 0x0, size 5512 bytes"
+echo "section: .text at 0x1588, size 23088 bytes"
+echo "section: .data at 0x6fb8, size 4424 bytes"
+echo "total size: 33024 bytes (72.9 kbit/s)"
+echo "entry point: 0x00000000"
+echo "grlib> run 0"
+echo "grlib> quit"
+

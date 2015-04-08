@@ -1,0 +1,22 @@
+
+
+export RODOS_ROOT=`pwd`
+export RODOS_DIR=${RODOS_ROOT}/..
+export RODOS_API=${RODOS_ROOT}/api
+export RODOS_MAKES=${RODOS_ROOT}/make
+export RODOS_LIBS=${RODOS_ROOT}/libs
+export RODOS_TO_LINK=${RODOS_ROOT}/to_link
+export RODOS_SUPPORT_LIBS=${RODOS_ROOT}/../rodos-support/support_libs
+export RODOS_SUPPORT_PROGS=${RODOS_ROOT}/../rodos-support/support_programs
+export RODOS_DOC=${RODOS_ROOT}/../rodos-doc/doc
+
+export PATH=${PATH}:${RODOS_MAKES}:
+
+alias cdrodos="cd ${RODOS_DIR}"
+
+############ READ THIS :
+#echo "      you may set following extra variables for your compilations:"
+#echo "         APP_INCLUDES (with -I)"
+#echo "         APP_LIBS (with -L and -l"
+
+

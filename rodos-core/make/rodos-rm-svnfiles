@@ -1,0 +1,30 @@
+
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+
+cd ${RODOS_ROOT}
+echo -n "occupied disc: "
+du -sh .
+
+\rm -rf .svn
+\rm -rf */.svn
+\rm -rf */*/.svn
+\rm -rf */*/*/.svn
+\rm -rf */*/*/*/.svn
+\rm -rf */*/*/*/*/.svn
+\rm -rf */*/*/*/*/*/.svn
+\rm -rf */*/*/*/*/*/*/.svn
+\rm -rf */*/*/*/*/*/*/*/.svn
+\rm -rf */*/*/*/*/*/*/*/*/.svn
+\rm -rf */*/*/*/*/*/*/*/*/*/.svn
+\rm -rf */*/*/*/*/*/*/*/*/*/*/.svn
+\rm -rf */*/*/*/*/*/*/*/*/*/*/*/.svn
+\rm -rf */*/*/*/*/*/*/*/*/*/*/*/*/.svn
+find . | grep ".svn"
+
+echo -n "after clear occupied disc: "
+du -sh .
+

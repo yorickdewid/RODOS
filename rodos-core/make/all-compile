@@ -1,0 +1,33 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+echo "***************************************************************"
+echo "*** compiling all sources, for all architecutes just to check"
+echo "****************************************************************"
+
+echo "  --------------------------------------------------------- " arm-compile-all
+arm-compile-all
+echo "  --------------------------------------------------------- " avr32-compile-all
+avr32-compile-all
+echo "  --------------------------------------------------------- " cortex-compile-all
+cortex-compile-all
+echo "  --------------------------------------------------------- " freertos-compile-all
+freertos-compile-all
+echo "  --------------------------------------------------------- " leon2spwrtc-compile-all
+leon2spwrtc-compile-all
+echo "  --------------------------------------------------------- " leon3ut699-compile-all
+leon3ut699-compile-all
+echo "  --------------------------------------------------------- " linux-compile-all
+linux-compile-all
+echo "  --------------------------------------------------------- " posix-compile-all
+posix-compile-all
+echo "  --------------------------------------------------------- " ppc405-qemu-compile-all
+ppc405-qemu-compile-all
+echo "  --------------------------------------------------------- " sparc64-compile-all
+sparc64-compile-all
+echo "  --------------------------------------------------------- " stm32-compile-all
+stm32-compile-all
+echo "  --------------------------------------------------------- " stm32f4-compile-all
+stm32f4-compile-all

@@ -1,0 +1,90 @@
+#!/bin/sh
+#
+# Author: Murat Goeksu <Murat.Goeksu@dlr.de>
+
+echo "======================================================"
+echo "= Leon3/Nexys3 GPIO and 7 segment display examples   ="
+echo "=                                                    ="
+echo "= Select configuration:                              ="
+echo "= (1) Led blink                                      ="
+echo "= (2) Switch and led                                 ="
+echo "= (3) 7 segment display and button                   ="
+echo "= (4) Led blink + 7 segment display and button       ="
+echo "= (5) Switch and led + 7 segment display and button  ="
+echo "======================================================"
+
+led_blink() {
+	echo "*** Executing leon3nexys3-lib..."
+	leon3nexys3-lib
+	echo "*** Compiling ..."
+	leon3nexys3-executable  gpio_led_example.cpp -o example
+	return
+}
+
+led_blink_sevenseg() {
+	echo "*** Executing leon3nexys3-lib..."
+	leon3nexys3-lib
+	echo "*** Compiling ..."
+	leon3nexys3-executable  gpio_led_example.cpp sevenseg_example.cpp -o example
+	return
+}
+
+switch_led() {
+	echo "*** Executing leon3nexys3-lib..."
+	leon3nexys3-lib
+	echo "*** Compiling ..."
+	leon3nexys3-executable  gpio_switch_led_example.cpp -o example
+	return
+}
+
+switch_led_sevenseg() {
+	echo "*** Executing leon3nexys3-lib..."
+	leon3nexys3-lib
+	echo "*** Compiling ..."
+	leon3nexys3-executable  gpio_switch_led_example.cpp sevenseg_example.cpp -o example
+	return
+}
+
+sevenseg() {
+	echo "*** Executing leon3nexys3-lib..."
+	leon3nexys3-lib
+	echo "*** Compiling ..."
+	leon3nexys3-executable  sevenseg_example.cpp -o example
+	return
+}
+
+
+
+selection(){
+	read -s -N 1 sel
+	case $sel in
+		1) 
+			echo "*** Led blink selected"
+			led_blink
+			;;
+		2) 
+			echo "*** Switch and led selected"
+			switch_led
+			;;
+		3) 
+			echo "*** 7 segment display and button selected"
+			sevenseg
+			;;
+	    4)
+	    	echo "*** Led blink + 7 segment display and button selected"
+	    	led_blink_sevenseg
+	    	;;
+		5)
+	    	echo "*** Switch and led + 7 segment display and button selected"
+	    	switch_led_sevenseg
+	    	;;
+		*) 
+			echo "doit: wrong input. Try again - (1/2/3/4/5)?"
+			selection
+			;;
+	esac
+}
+
+selection
+
+echo "*** Finished. Type 'flashit' to transfer it with GRMON."

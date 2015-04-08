@@ -1,0 +1,13 @@
+
+
+echo "****************************************************" 
+echo "*** plase call (only once) from RODOS root directory"
+echo "***         source make/rodosenvs"
+echo "*** else i can not do any thing"
+echo "*** make libs from rodos root directory"
+echo "*** then compile applications in local directories"
+echo "****************************************************" 
+
+exit;
+
+

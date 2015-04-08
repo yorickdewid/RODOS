@@ -1,0 +1,20 @@
+------first line-----------
+*** This is an example input mask for maskgen.cpp *****
+
+Time [TIME    ]           Board ID [BID]         satelite state [STATE]
+
+applications
+   watchdog        [WO]                              Tranmiter [TS]
+   survillance     [SO]                              Receiver  [RS]
+   Time mamanger   [TO]                ----------------------------------
+   Power control   [PC]                        Batteire ladung   [BQ]
+   Themral Control [TC]                        Batteire Spannung [BS]
+
+
+----------------------------------------------------------------------------
+
+** See the example code to test in in example.cpp and the generated mask.h 
+
+       exampleCnt [EXAMP]
+
+----- last line ------------

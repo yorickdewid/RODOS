@@ -1,0 +1,5 @@
+
+cd $RODOS_SUPPORT_LIBS
+doit-linux_x86
+
+

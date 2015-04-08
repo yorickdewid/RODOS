@@ -1,0 +1,18 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+echo "********************************************"
+echo "*** compiling all sources, just to check"
+echo "*** to compile one specially see doit"
+echo "********************************************"
+echo
+for i in  *.cpp
+do
+echo $i
+avr32-executable $i
+done
+
+
+

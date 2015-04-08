@@ -1,0 +1,81 @@
+#!/bin/bash
+
+#************************************************************************
+# Script that sets the variables for the compilation of rodos for
+# the arm envoirenment. 
+#************************************************************************
+
+# PROJECT ******************#
+ARCH=arm-cortexA9
+MY_SRCS="${RODOS_ROOT}/src/bare-metal-generic"
+MY_HW_SRCS="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+#***************************#
+
+# ARM TOOLS ****************#
+ARM_TOOLS="/opt/arm-tools"
+ARM_VERSION="4.6.3"
+ARM_TOOLS_BIN="${ARM_TOOLS}/bin"
+CXX_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-g++ "
+CC_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-gcc "
+CPP_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-cpp "
+AS_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-as "
+LD_COMP="${ARM_TOOLS_BIN}/arm-none-eabi-ld "
+OBJCOPY="${ARM_TOOLS_BIN}/arm-none-eabi-objcopy "
+#***************************#
+
+# ARM MODE OPTIONS *********#
+ARM_CPU="-mcpu=cortex-a9"
+ARM_FLOAT="-mfloat-abi=soft" #"-msoft-float"
+#***************************#
+
+# Project includes *********#
+MY_HW_INC="${RODOS_ROOT}/src/bare-metal/${ARCH}/inc"
+MY_HW_CORE="${RODOS_ROOT}/src/bare-metal/${ARCH}/inc/core"
+MY_HW_MX6D="${RODOS_ROOT}/src/bare-metal/${ARCH}/inc/mx6d"
+MY_HW_REGS="${RODOS_ROOT}/src/bare-metal/${ARCH}/inc/mx6d/registers"
+MY_HW_DRIVERS="${RODOS_ROOT}/src/bare-metal/${ARCH}/drivers/inc"
+INCLUDES=" -I${RODOS_ROOT}/api -I${MY_SRCS} -I${MY_HW_SRCS} -I${MY_HW_INC} -I${MY_HW_CORE} -I${MY_HW_MX6D} -I${MY_HW_REGS} -I${MY_HW_DRIVERS} -I${RODOS_SUPPORT_LIBS}"
+# System includes **********#
+LIB_GCC_PATH="${ARM_TOOLS}/lib/gcc/arm-none-eabi/$ARM_VERSION/include"
+LIB_GCC_FIX_PATH="${ARM_TOOLS}/lib/gcc/arm-none-eabi/$ARM_VERSION/include-fixed"
+LIB_EABI_PATH="${ARM_TOOLS}/arn-none-eabi/include"
+LIB_CXX_PATH="${ARM_TOOLS}/arn-none-eabi/include/c++/$ARM_VERSION"
+LIB_CXX_EABI_PATH="${ARM_TOOLS}/arn-none-eabi/include/c++/$ARM_VERSION/arm-none-eabi"
+LIB_CXX_BACKWARD_PATH="${ARM_TOOLS}/arn-none-eabi/include/c++/$ARM_VERSION/backward"
+SYSTEM_INC=" -isystem ${LIB_GCC_PATH} -isystem ${LIB_GCC_FIX_PATH} -isystem ${LIB_EABI_PATH} "
+SYSTEM_INC_GXX=" ${SYSTEM_INC} -isystem ${LIB_CXX_PATH} -isystem ${LIB_CXX_EABI_PATH} -isystem ${LIB_CXX_BACKWARD_PATH}"
+#***************************#
+
+# Symbols ******************#
+CPU0=" -DCPU0 "
+CPU1=" -DCPU1 "
+CPU2=" -DCPU2 "
+CPU3=" -DCPU3 "
+#***************************#
+
+# Flags ********************#
+ARM_FLAGS=" ${ARM_CPU} ${ARM_FLOAT} "
+WARNINGS_FLAGS=" -Wall "
+OPTIMIZATION_FLAGS=" -O0 "
+DEBUG_FLAGS=" -g "
+# Compiler flags ***********#
+ASM_FLAGS=" -x assembler-with-cpp ${ARM_FLAGS} ${WARNINGS_FLAGS} ${DEBUG_FLAGS}"
+GCC_FLAGS=" ${ARM_FLAGS} ${WARNINGS_FLAGS} ${OPTIMIZATION_FLAGS}"
+CXX_FLAGS=" -fno-rtti -fno-exceptions ${ARM_FLAGS} ${WARNINGS_FLAGS} ${OPTIMIZATION_FLAGS}"
+#***************************#
+
+
+
+# LINKER *******************#
+CPU0_SCRIPT="${RODOS_ROOT}/src/bare-metal/${ARCH}/scripts/CPU0.ld"
+CPU1_SCRIPT="${RODOS_ROOT}/src/bare-metal/${ARCH}/scripts/CPU1.ld"
+CPU2_SCRIPT="${RODOS_ROOT}/src/bare-metal/${ARCH}/scripts/CPU2.ld"
+CPU3_SCRIPT="${RODOS_ROOT}/src/bare-metal/${ARCH}/scripts/CPU3.ld"
+
+LINKER_FLAGS=" -nostartfiles -nodefaultlibs -nostdlib "
+
+LINKER_LIB_PATH="${RODOS_ROOT}/libs/${ARCH}"
+LINKER_LIB_INC=" -lrodos -lm -lc -lgcc "
+
+LINKER_OPTIONS=" ${LINKER_FLAGS} ${ARM_FLAGS} ${DEBUG_FLAGS} "
+#***************************#

@@ -1,0 +1,14 @@
+
+
+
+
+
+Time sync (SNTP) - Server
+----------------------------------------------------------
+
+Last client node:  [CL_NODE  ]
+Client requests:   [REQ      ]
+
+----------------------------------------------------------
+Interrupt time: [INT_TIME_SRV    ] milliseconds
+

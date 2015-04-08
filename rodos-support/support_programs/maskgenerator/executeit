@@ -1,0 +1,12 @@
+g++ generator.cpp 
+a.out < mask.txt > mask.h
+g++ example.cpp 
+a.out
+
+### use generator-split.cpp to get separated files for defines and variable definition
+# g++ generator-split.cpp
+# a.out < mask.txt
+##### generates mask.h and mask-screen.h
+
+
+

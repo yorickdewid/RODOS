@@ -1,0 +1,10 @@
+
+#!/bin/bash
+
+\rm -rf rodosgui
+javac -d ./ src/*.java
+
+jar cfm tst_rodosgui.jar manifest.txt rodosgui/
+
+\rm -rf rodosgui
+

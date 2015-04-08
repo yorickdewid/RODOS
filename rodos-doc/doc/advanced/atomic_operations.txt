@@ -1,0 +1,57 @@
+
+                               Atomic Operations
+                          Andre Bartke <dev@bartke.cc>
+
+This document describes how to properly implement atomic interfaces for
+bare-metal ports. We keep these interfaces compareable to what you may find on
+other operating systems like Linux.
+
+Each platform shall provide an atomic.h header file that also defines the
+atomic_t type. atomic_t shall be implemented as a signed integer:
+
+  typedef struct {
+    int counter;
+  } atomic_t;
+
+To avoid some mistakes it is encapsulated into a struct to catch non-atomic
+access and make casts to an integer fail:
+
+  atomic_t foo;
+  foo++; // error!
+
+Basic operations that should be present include an initializer, and simple read
+and write operations to the counter.
+
+#define atomic_init(i)              {(i)}
+#define atomic_get(v)               ((v)->counter)
+#define atomic_set(v, i)            ((v)->counter = (i))
+
+Note that these are non-atomic reads and writes.
+
+
+For C++ ABI guards as well as semaphores and mutexes an atomic compare and
+exchange is required with the following interface:
+
+  int atomic_cmpxchg(atomic_t *v, int old, int new);
+
+The function returns old, you can check if the operation was successful by
+comparing 'old' with the return value. A trylock for a mutex may look like the
+following:
+
+  if(atomic_cmpxchg(count, 1, 0) == 1)
+    return true;
+  return false;
+
+A C dummy implementation:
+
+static inline int atomic_cmpxchg(atomic_t *v, int o, int n) {
+  int ret = v->counter;
+  if(ret == o)
+    v->counter= n;
+
+  return ret;
+}
+
+
+TODO ...
+

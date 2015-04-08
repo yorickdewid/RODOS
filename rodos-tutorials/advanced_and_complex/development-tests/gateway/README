@@ -1,0 +1,50 @@
+
+
+This is a tutorial to write gateways from the RODOS middleware
+to different networks.
+
+If you are a normal user who does not want to extende RODOS
+then you do not need to read this.
+
+
+Read First tutorial_middleware_distributed
+
+Sender and receiver are examples of normal aplications.
+
+gatewayexample :
+	1. forwards messages to stdout (just print)
+	2. read messages from stdoin (nowaiting) in the form of two integers
+		the first represents a tocic id and the second a value
+		this work only with subscribers to topics like
+		Topic<long,   10>    counter1;
+		the value may be only a long (4 bytes)
+
+At the end of linkinterfaceexample.cc you can see how to define
+which topics shall be forwarded to the network.
+
+Try:
+compile-linux demo_topics.cc linkinterfaceexample.cc
+	tst
+	type for example
+		10 200
+		20 200
+		30 200
+
+compile-linux demo_topics.cc linkinterfaceexample.cc receiver*
+	tst
+	type for example
+		10 200
+		20 200
+		30 200
+		40 200
+		50 200
+		10 100
+
+compile-linux demo_topics.cc linkinterfaceexample.cc sender*
+	try to modify the forwad lis at the end of networkexample.cc and retry
+
+compile-linux demo_topics.cc linkinterfaceexample.cc sender* receiver*
+
+
+
+

@@ -1,0 +1,38 @@
+#!/bin/bash
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi
+
+# Create project directory
+if [ -d "iMX6" ]; then
+	\rm -rf iMX6/cpu3
+	mkdir iMX6/cpu3
+else
+	mkdir iMX6
+	# Create sub-directory for current CPU ID
+	mkdir iMX6/cpu3
+fi
+
+# Setting environment
+source ${RODOS_MAKES}/iMX6-set-vars
+source ${RODOS_MAKES}/console_colors
+
+# Compile target file ******#
+echo $GREEN_BOLD"Compiling target file for cpu3:" $*
+${CXX_COMP} ${CPU_FLAG} ${CXX_FLAGS} -DCPU3 ${INCLUDES} -c $*
+#***************************#	
+
+# Linking file *************#
+echo $BLUE_BOLD"Linking target file:            "$*" -> cpu3.elf"
+${CXX_COMP} -T${CPU3_SCRIPT} ${LINKER_OPTIONS} -L${LINKER_LIB_PATH} -o cpu3.elf *.o ${LINKER_LIB_INC}
+#***************************#
+
+# Converting the image *****#
+echo $RED_BOLD"Converting:                     cpu3.elf -> cpu3.bin (binary) " $RESET
+${OBJCOPY} -O binary cpu3.elf cpu3.bin
+#***************************#
+
+# Move compiled files ******#
+mv *.o *.elf *.bin iMX6/cpu3
+\rm -f *.o *.elf *.bin
+#***************************#

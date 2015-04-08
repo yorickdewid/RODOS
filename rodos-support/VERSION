@@ -1,0 +1,23 @@
+Rodos Support
+
+NEXT:
+    bugfix spiFlash_N25Q00AA: set4ByteAddr
+
+119:
+    added SPI FLASH driver for N25Q00AA   
+    extentions in matlib (class Rotor & class RPY)
+    extentions in mat: trust and lowpassfilter (signalprocessing.h)
+    BUG in malib.cpp Quaterion(RPY) roll and yaw was switched
+    matlib.h (removed double comments)
+    added implementation of gedodetic, ecef, eci
+    added double drand
+
+118:
+    stm32f4: added SD Card(SDIO) support to filesystem
+    S70L01GS flash    
+
+117:
+    activieties as standard support lib
+    flash enhancements
+    matlib extended
+    avr32 support

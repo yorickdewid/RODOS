@@ -1,0 +1,6 @@
+
+compile *.cc
+
+	sender01 send a counter.
+	int receives from a uart time messages
+

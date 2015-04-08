@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sudo openocd -f ${RODOS_ROOT}/src/bare-metal/raspberrypi/jtagconfig/olimex.cfg \
+  -f ${RODOS_ROOT}/src/bare-metal/raspberrypi/jtagconfig/raspi.cfg \
+  -c init -c halt -c "load_image $1" -c "resume 0"
+

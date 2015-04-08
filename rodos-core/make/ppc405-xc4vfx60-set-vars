@@ -1,0 +1,89 @@
+#! /bin/bash
+
+# written by Andre Bartke <dev@bartke.cc>
+# and Tobias Mikschl <tobias.mikschl@uni-wuerzburg.de>
+# Adapted from sparc64/ppc405 versions.
+
+#Select used development board / FPGA Config
+#USE_DEV_BOARD=SSMMU-OLD
+USE_DEV_BOARD=BIROS
+
+# Include this with the source command
+
+export ARCH="ppc405"
+export BSP="xc4vfx60"
+export CROSS_PREFIX="powerpc-unknown-elf"
+
+# This corresponds to the cross toolchain out-of-path executables
+export PATH="/opt/cross-$CROSS_PREFIX/$CROSS_PREFIX/bin:$PATH"
+export PATH="/usr/lib/cross-$CROSS_PREFIX/$CROSS_PREFIX/bin:$PATH"
+export PATH="/opt/Xilinx/SDK/2013.4/bin/lin:$PATH"
+
+## Directory structure:
+export RODOS_SRC1="${RODOS_ROOT}/src/independent"
+export RODOS_SRC2="${RODOS_ROOT}/src/independent/gateway"
+export RODOS_SRC3="${RODOS_ROOT}/src/bare-metal-generic"
+export RODOS_ARCH_SRC="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+export RODOS_ARCH_DST="${RODOS_LIBS}/${ARCH}/${BSP}"
+
+## Compiler settings: See the sparc64/tools directory for a cross compiler
+TEST=`which gcc|grep powerpc`
+
+if [ "$TEST" == "" ]; then
+  echo "Cross Compiler not found, aborting..."
+  exit
+fi
+
+# out-of-path executables
+export CC=gcc
+export CXX=g++
+export LD=ld
+export AS=as
+export AR=ar
+export RANLIB=ranlib
+export OBJCOPY=objcopy
+export OBJDUMP=objdump
+
+GCC_BASE_DIR=`dirname ${CC}`
+PATH="${GCC_BASE_DIR}:${PATH}"
+
+# compiler flags
+export CWARNINGS=" -Wall -Wextra" # -Werror"
+export CXXWARNINGS="" # ${CWARNINGS} -Weffc++"
+
+export CFLAGS=" -g -fno-builtin -nostdlib -ffreestanding"  #-DNO_RODOS_NAMESPACE"
+export CFLAGS+=" -O0 -mcpu=405 -static -pipe -msoft-float"
+export CFLAGS+=" -D__USE_GLOBAL_CXXABI__" # use the new environment
+export CFLAGS+=" -D__USE_GLOBAL_CRT__" # use the new environment
+
+if [ ${USE_DEV_BOARD} = BIROS ]; then
+  echo "Compiling for BIROS Development Board and FPGA-Config"
+  export CFLAGS+=" -DUSE_DEV_BOARD_BIROS"
+elif [ ${USE_DEV_BOARD} = SSMMU-OLD ]; then 
+  echo "Compiling for old Development Board and FPGA-Config"
+  export CFLAGS+=" -DUSE_DEV_BOARD_OLDSSMMU"
+else
+	echo "USED_DEV_BOARD not specified in make/ppc405-xc4vfx60-set-vars"
+	exit 1
+fi
+
+
+export CXXFLAGS=" ${CFLAGS}"
+export CXXFLAGS+="  -fno-rtti -nostartfiles  -nostdinc++ -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables"
+export CXXFLAGS+=" ${CXXWARNINGS}"
+
+# we will gather all .c, .cpp and .S files from these directories.
+export INCLUDES=" \
+	-I${RODOS_ARCH_SRC} \
+	-I${RODOS_ARCH_SRC}/include \
+	-I${RODOS_ARCH_SRC}/include/bsp-${BSP} \
+	-I${RODOS_SRC1} \
+	-I${RODOS_SRC2} \
+	-I${RODOS_SRC3} \
+	-I${RODOS_API}  \
+	-I${RODOS_SUPPORT_LIBS} \
+	${APP_INCLUDES} "
+
+export CXX_LINKER_FLAGS=" -Wl,-T ${RODOS_ARCH_SRC}/link.ld"
+export CXX_LINKER_FLAGS+=" -L ${RODOS_ARCH_DST} -lrodos -lgcc"
+

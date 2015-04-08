@@ -1,0 +1,141 @@
+#!/bin/bash
+
+# written by Andre Bartke <dev@bartke.cc>
+
+# do not print error if wildcards are not found
+shopt -s nullglob
+
+# check environment
+if [ -z "${RODOS_ROOT}" ]; then
+  source "`dirname $0`/print_no_envs_warning"
+fi
+
+source "${RODOS_MAKES}/sparc64-set-vars"
+
+SIMICS_VER=4.2
+QEMU_SPARC64_BIN=`which qemu-system-sparc64`
+SIMICS_WORKSPACE=`cat ~/.simics/$SIMICS_VER/prefs | grep gui_default_workspace | cut -d \" -f 2`
+ISODIR=$RODOS_ARCH_DST/iso
+
+## first we have to create the iso image
+
+if [ ! -e tst ] ; then
+  echo "Error: tst not found."
+  echo "first call ppc405-qemu-executable yourfile.cpp"
+  exit
+fi
+
+if [ "$MKISOFS" == "" ]; then
+  echo "You need mkisofs in order to build a test image"
+  exit
+fi
+
+# start fresh
+rm -rf $ISODIR
+mkdir -p $ISODIR
+
+echo ""
+echo "-- ISO image: Installing SILO bootloader"
+mkdir -p $ISODIR/boot
+cp $RODOS_ARCH_SRC/boot/silo/silo.conf $ISODIR/boot/
+cp $RODOS_ARCH_SRC/boot/silo/COPYING $ISODIR/boot/
+cp $RODOS_ARCH_SRC/boot/silo/README $ISODIR/boot/
+tar -C $ISODIR -xzf $RODOS_ARCH_SRC/boot/silo/silo-loaders-1.4.11.tar.gz
+
+echo "-- ISO image: Compressing and copying contents"
+mkdir -p $ISODIR/rodos
+cp $RODOS_ARCH_SRC/boot/rodos/rodos.txt $ISODIR/rodos/
+gzip -c tst > $RODOS_ARCH_DST/vmrodos.gz
+ln -sf $RODOS_ARCH_DST/vmrodos.gz $ISODIR/rodos/vmrodos.gz
+
+echo "-- ISO image: Writing image.iso"
+mkisofs -quiet -f -G $ISODIR/boot/isofs.b -B ... -r -o $RODOS_ARCH_DST/image.iso $ISODIR
+echo "...done."
+
+echo ""
+gzip -l $RODOS_ARCH_DST/vmrodos.gz
+
+## then we choose an emulator and run it
+
+if [ "$SIMICS_WORKSPACE" != "" ] && [ "$QEMU_SPARC64_BIN" != "" ]; then
+  echo ""
+  echo "-- Starting emulator"
+
+  while true; do
+    echo "I found:"
+    echo " [1] SIMICS"
+    echo " [2] SIMICS GUI"
+    echo " [3] QEMU"
+    echo " [4] QEMU GDB Remote Debugging"
+    echo " [a] abort"
+    read -p "which one do you want to use? [1|2|3|4|a] " select
+
+    case $select in
+      [1] )
+        $SIMICS_WORKSPACE/simics -e "\$cdrom_path=$RODOS_ARCH_DST/image.iso" $RODOS_ROOT/make/sparc64-config.simics
+  break;;
+      [2] )
+        $SIMICS_WORKSPACE/simics-gui -e "\$cdrom_path=$RODOS_ARCH_DST/image.iso" $RODOS_ROOT/make/sparc64-config.simics
+  break;;
+      [3] )
+        $QEMU_SPARC64_BIN -cdrom $RODOS_ARCH_DST/image.iso -boot d -nographic
+  break;;
+      [4] )
+        $QEMU_SPARC64_BIN -cdrom $RODOS_ARCH_DST/image.iso -boot d -nographic -S -s
+  break;;
+      [aA] )
+        exit;;
+    esac
+  done
+elif [ "$SIMICS_WORKSPACE" != "" ]; then
+  echo ""
+  echo "-- Starting emulator"
+
+  while true; do
+    echo "I found:"
+    echo "  [1] SIMICS"
+    echo "  [2] SIMICS GUI"
+    echo "  [a] abort"
+    read -p "which one do you want to use? [1|2|a] " select
+
+    case $select in
+      [1] )
+        $SIMICS_WORKSPACE/simics -e "\$cdrom_path=$RODOS_ARCH_DST/image.iso" $RODOS_ROOT/make/sparc64-config.simics
+  break;;
+      [2] )
+        $SIMICS_WORKSPACE/simics-gui -e "\$cdrom_path=$RODOS_ARCH_DST/image.iso" $RODOS_ROOT/make/sparc64-config.simics
+  break;;
+      [aA] )
+        exit;;
+    esac
+  done
+
+elif [ "$QEMU_SPARC64_BIN" != "" ]; then
+  echo ""
+  echo "-- Starting emulator"
+
+  while true; do
+    echo "I found:"
+    echo "  [1] QEMU"
+    echo "  [2] QEMU GDB Remote Debugging"
+    echo "  [a] abort"
+    read -p "which one do you want to use? [1|2|a] " select
+
+    case $select in
+      [1] )
+        $QEMU_SPARC64_BIN -cdrom $RODOS_ARCH_DST/image.iso -boot d -nographic
+    break;;
+      [2] )
+        $QEMU_SPARC64_BIN -cdrom $RODOS_ARCH_DST/image.iso -boot d -nographic -S -s
+    break;;
+      [aA] )
+        exit;;
+    esac
+  done
+
+else
+  echo "I found neither SIMICS nor QEMU for emulation, sorry..."
+  echo "sudo apt-get install qemu-kvm"
+  echo "sudo apt-get install qemu-kvm-extras"
+fi
+

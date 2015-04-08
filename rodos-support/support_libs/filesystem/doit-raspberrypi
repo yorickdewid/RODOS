@@ -1,0 +1,14 @@
+#!/bin/sh
+
+\rm -f *.o
+
+#${C_COMP}   ${CFLAGS}              ${INCLUDES} ./bare-metal-generic/fatfs/*.c -c
+${CXX} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES} ./bare-metal-generic/fatfs/*.cpp  -c
+${CXX} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES} ./bare-metal-generic/*.cpp  -c
+${CXX} ${CFLAGS}  ${CPPFLAGS} ${INCLUDES} ./bare-metal/raspberrypi/*.cpp -c 
+
+${AR} -r ${RODOS_LIBS}/${ARCH}/librodos.a *.o
+\rm -f *.o
+
+
+

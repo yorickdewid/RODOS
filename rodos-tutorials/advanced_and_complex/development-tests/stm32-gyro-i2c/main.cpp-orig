@@ -1,0 +1,162 @@
+/*
+ * Copyright (c) 2011 Fraunhofer FIRST, Berlin
+ * All rights reserved.
+ *
+ * @author Bernd Oestmann
+ */
+
+#include "x_vaprintf.h"
+#include "uart.h"
+#include "led.h"
+
+#include "stm32f10x.h"
+#include "stm32f10x_rcc.h"
+#include "stm32f10x_gpio.h"
+#include "stm32f10x_i2c.h"
+
+#include "i2cbus.h"
+#include "itg3200.h"
+
+#include "pre-rodos.h"
+
+/*
+ *	SysTick Interrupt Handler
+ */
+volatile unsigned long SysTick_cnt;
+
+extern "C" {
+
+void SysTick_Handler() {
+	++SysTick_cnt;
+}
+
+};
+
+void msSleep(unsigned int ms) {
+	unsigned long te = SysTick_cnt + ms;
+
+	while( SysTick_cnt < te ) {
+		 __WFI();
+	}
+}
+
+/*
+ *	xprintf
+ */
+static void outc(int c, void *cookie) {
+	uart_putchar(c);
+}
+
+/*static*/ void xprintf(const char *fmt, ...) {
+	va_list ap;
+
+	va_start(ap, fmt);
+	x_vaprintf(outc, 0, fmt, ap);
+	va_end(ap);
+}
+
+
+#if 1
+
+/*
+ *	PA8 (Interrupt Signal from ITG3200)
+ */
+extern void pa8_exti_init();
+extern void pa8_exti_callup(void (*f)());
+
+volatile int pa8_intr_cnt;
+
+static void pa8_intr_handler() {
+	++pa8_intr_cnt;
+}
+
+static void pa8_init() {
+	pa8_exti_init();
+	pa8_exti_callup(pa8_intr_handler);
+}
+#endif
+
+
+class Prime {
+public:
+      int x;
+      Prime( int xp) {
+		xprintf("\n\nDas ist vor main\n\n");
+	        x = xp;
+	}
+};
+
+static Prime prime1(123);
+static Prime prime2(234);
+static Prime prime3(345);
+
+
+
+/*
+ *	main
+ */
+int main(void) {
+
+	xprintf("\n\n VERSION (3.0) Init constructus %d %d %d  sm 1.0 \n", prime1.x, prime2.x, prime3.x);
+	//xprintf("\n\nlong logn %lld %lld %lld  sm 1.0 \n", cntll1, cntll2, cntll3);
+	//printf("\n\n fp  %f, %f\n", 3.1415, 2.78);
+	xprintf("\n\n\tGyro V1.93s\n");
+
+	// printf("Hello worln\n");
+	xprintf("\nDas war der normale printf\n");
+
+	long long llcnt = 0;
+	for(llcnt = 0; llcnt < 20; llcnt++) {
+		xprintf(" llcnt = %ld  100, 200, 300 = %d %d %d\n", llcnt, 100, 200, 300);
+		xprintf(" time = %ld \n", SysTick_cnt);
+	}
+
+
+	/* Setup SysTick */
+	SystemCoreClockUpdate();
+	SysTick_Config(SystemCoreClock / 1000);
+
+	/*****/
+
+	pa8_init();
+
+	ITG3200 gyro(i2c_bus1(), 0xD2);
+
+	if( gyro.setup() ) {
+		xprintf("ITG3200::setup() failed! Stop!\n");
+		for(;;) {
+			led(0);
+			msSleep(400);
+			led(1);
+			msSleep(100);
+		}
+	}
+
+	int nerr = 0;
+	for(;;) {
+		led(0);
+		if( pa8_intr_cnt ) {
+			// Overflow
+			static int novfl;
+
+			if( novfl < 8 ) {
+				++novfl;
+				xprintf("ITG3200: overflow\n");
+			}
+		}
+		while( !pa8_intr_cnt ) {
+			;		// busy wait
+		}
+		pa8_intr_cnt = 0;
+		led(1);
+
+		if( gyro.update() ) {
+			// I2C failure, retry ...
+			++nerr;
+			xprintf("I2C error #%d.\n", nerr);
+			continue;
+		}
+
+		xprintf("**[ %d %d %d ]**\r", gyro.x, gyro.y, gyro.z);
+	}
+}

@@ -1,0 +1,11 @@
+#! /bin/bash
+
+shopt -s nullglob
+
+if [ -z "$RODOS_ROOT" ]; then
+  source "`dirname $0`/print_no_envs_warning"
+fi
+
+source "${RODOS_MAKES}/ppc405-xc4vfx60-set-vars"
+
+xmd -tcl "$RODOS_ARCH_SRC/boot/bsp-${BSP}/load_bootloader.tcl" "$RODOS_ARCH_DST/${BSP}_boot.elf"

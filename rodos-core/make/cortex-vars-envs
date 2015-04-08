@@ -1,0 +1,46 @@
+###
+
+
+ARCH=arm_cortex
+
+MY_SRCS="${RODOS_ROOT}/src/bare-metal-generic"
+MY_HW_SRCS="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+
+
+
+# INCLUDES=" -I${RODOS_API}  -I${MY_SRCS}  -I${MY_HW_SRCS} -I${RODOS_SUPPORT_LIBS} ${APP_INCLUDES}"
+
+
+CFLAGS_COMMON="-mthumb -mcpu=cortex-m3 -Wno-long-long -msoft-float -Wextra -Wno-unused-parameter -nostartfiles -nodefaultlibs -nostdlib -fno-unwind-tables -fno-asynchronous-unwind-tables -mapcs-frame -MD -Wall -Os -D inline=  -ffunction-sections -fdata-sections -Wno-write-strings -g"
+
+
+CFLAGS="${CFLAGS_COMMON} " 
+CPPFLAGS="${CFLAGS_COMMON} -D NO_RODOS_NAMESPACE -D CM3=1 -fno-exceptions  -fno-rtti"
+AFLAGS="-mthumb -mcpu=cortex-m3 -MD"
+
+
+INCLUDES=" -I. -I${RODOS_API}  -I${MY_SRCS}  -I${MY_HW_SRCS} -I${MY_HW_SRCS}/hw -I${MY_HW_SRCS}/inc -I${MY_HW_SRCS}/src -I${MY_HW_SRCS}/utils -I${MY_HW_SRCS}/sd_fatfs/src -I${MY_HW_SRCS}/udp_lwip/src/include -I${MY_HW_SRCS}/udp_lwip/src/include/ipv4 -I${MY_HW_SRCS}/udp_lwip/port -I${MY_HW_SRCS}/udp_lwip/port -I${RODOS_SUPPORT_LIBS} ${APP_INCLUDES}"
+
+
+LINKFLAGS=" -Wl,--script=${MY_HW_SRCS}/scripts/linkerscript -L${RODOS_LIBS}/${ARCH} -lrodos ${APP_LIBS} -lm -lgcc -lg -lstdc++  -lgcc"
+
+LDFLAGS=" -Wl,--gc-sections -mthumb -mcpu=cortex-m3 "
+ 
+ENTRY=ResetISR
+
+
+
+################ Tool chain #################
+
+COMPILER_ROOT="/opt/arm-tools/bin"
+#COMPILER_ROOT="/opt/arm-codesourcery/Sourcery_G++_Lite/bin"
+## hw-path COMPILER_ROOT="/usr/local/CodeSourcery/Sourcery_G++_Lite/bin"
+CPP_COMP="${COMPILER_ROOT}/arm-none-eabi-g++"
+C_COMP="${COMPILER_ROOT}/arm-none-eabi-gcc"
+AR="${COMPILER_ROOT}/arm-none-eabi-ar"
+OBJCOPY="${COMPILER_ROOT}/arm-none-eabi-objcopy"
+OBJDUMP="${COMPILER_ROOT}/arm-none-eabi-objdump"
+
+
+
+

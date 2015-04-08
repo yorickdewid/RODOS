@@ -1,0 +1,25 @@
+
+CURRENT STATUS
+==============
+
+Thread Handling, Interrupts and Uart are very well tested on the ECU (Levitator).
+
+
+LIMITATIONS
+===========
+
+This RODOS port will only work for LPC23xx and LPC24xx as it relies on the
+Vectorised Interrupt Controller (VIC) of these devices.
+
+When changing VIC_VectAddr and implementing a sporious interrupt handler
+the code will work on the other ARM7 controllers from NXP as well.
+
+For controller from other manufactors more work needs to be done.
+
+
+AUTHORS
+=======
+
+- David Waleczek wrote the initial ARM7 port of RODOS
+- Fabian Greif added amongst other things Interrupt handling, an extended Abort
+  handler and an Interrupt driven UART implementation

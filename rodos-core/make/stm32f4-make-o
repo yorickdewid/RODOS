@@ -1,0 +1,11 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/stm32f4-set-vars
+
+${CPP_COMP}   ${CFLAGS} ${CPPFLAGS} ${INCLUDES} -c  $* 
+
+
+

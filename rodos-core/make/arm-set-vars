@@ -1,0 +1,23 @@
+
+ARCH=arm_v4
+
+MY_SRCS="${RODOS_ROOT}/src/bare-metal-generic"
+MY_HW_SRCS="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+
+
+CFLAGS_BASICS=" -fno-exceptions -mapcs-frame -Wall -pedantic -Wextra -Wno-unused-parameter -Wno-long-long -O0 -g"
+HWCFLAGS=" -mcpu=arm7tdmi -mthumb-interwork -msoft-float -nostartfiles -nodefaultlibs -nostdlib -fno-exceptions -Wno-long-long -fno-unwind-tables -fno-asynchronous-unwind-tables "
+
+INCLUDES=" -I${RODOS_API}  -I${MY_SRCS}  -I${MY_HW_SRCS} -I${RODOS_SUPPORT_LIBS} ${APP_INCLUDES}"
+
+
+CFLAGS=" ${CFLAGS_BASICS} ${HWCFLAGS} "
+CPPFLAGS=" -fno-rtti "
+
+#FIRST_LINK_OBJ=" ${RODOS_LIBS}/${ARCH}/00globalobjects.o "
+LINKFLAGS=" -Wl,-T${MY_HW_SRCS}/linkerscript.ld  -L ${RODOS_LIBS}/${ARCH} -lrodos  ${APP_LIBS} -lm -lgcc "
+
+ARM_TOOLS="/opt/arm-tools/bin" 
+
+CPP_COMP="${ARM_TOOLS}/arm-none-eabi-g++ "
+C_COMP="${ARM_TOOLS}/arm-none-eabi-gcc "

@@ -1,0 +1,11 @@
+
+build_supportprograms guiserveropengl
+
+pushd ${RODOS_SUPPORT_PROGS}//server-opengl/example-3dmodels
+../tst &
+sleep 2
+popd
+
+linux-executable  opengl-client.cpp
+tst
+

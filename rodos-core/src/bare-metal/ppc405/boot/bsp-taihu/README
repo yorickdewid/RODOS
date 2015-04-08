@@ -1,0 +1,2 @@
+QEMU requires a "bios" ROM image for the ppc405. In our case this is just an
+absolute jump to our usual kernel entry point.

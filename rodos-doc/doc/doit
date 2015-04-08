@@ -1,0 +1,6 @@
+doxygen Doxyfile
+
+\rm -rf reference-doc
+mv doc reference-doc
+mv reference-doc/html/* reference-doc/.
+

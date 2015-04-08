@@ -1,0 +1,146 @@
+RHODOS                                                               L. Dittrich
+A Real-Time Operating System                                                 DLR
+                                                                      April 2008
+
+
+                  RHODOS: A Real-Time Operating System
+
+#define __SECTION_COUNTER 1
+
+
+__GET_AND_INC_SECTION_COUNTER(). Introduction
+
+This real-time operating system is intended for stand alone use in embedded 
+systems, but can also run on-top of Linux as guest OS. It is built as static
+library. You can link your user code against this library and run the resulting
+binary. The operating system is written mainly in the C++ programming language
+some hardware dependent parts are written in C and target specific assembly
+language. 
+
+
+
+__GET_AND_INC_SECTION_COUNTER(). Startup
+
+The execution of the binary starts at its entry point. Then some library and 
+initialisation is done. The .bss segment is initialized with zeros. Then the 
+constructors of static Objects are executed and then follows a call to the well
+known main routine. This main function is provided by the operating system 
+(core/main.cc) and does further initialization tasks (e.g. timer), calls the 
+MAIN() function and finally calls the scheduler. The user can provide its own 
+MAIN() function to do its own initializations.
+
+
+
+__GET_AND_INC_SECTION_COUNTER(). About Threads
+
+The class Thread provides an abstraction of threads of executaion. Each instance
+of Thread is a single thread of execution with its own stack and context. The 
+context of a thread consists of the contents of the cpu registers and the used
+memory.  Threads are organized internally as a
+linked list. The scheduler uses this list to find the next thread to run. The
+class Thread has a pure virtual method run(). So if you want your own thread
+you just have to create a class that inherits from class Thread and provide 
+a method run() with the code you want to execute. For per Thread initialization
+you can overwrite the method init() which is called during the initialisation
+phase before the first thread is executed. 
+
+
+__GET_AND_INC_SECTION_COUNTER(). About context switches
+
+Contexts and context switch are hardware dependent.
+
+__GET_AND_INC_SECTION_COUNTER().__GET_AND_INC_SUBSECTION_COUNTER(). Architecture x86 (Linux)
+__GET_AND_INC_SECTION_COUNTER().__GET_AND_INC_SUBSECTION_COUNTER().__GET_AND_INC_SUBSUBSECTION_COUNTER(). Application Binary Interface (ABI)
+
+This software uses the System V Application Binary Interface 
+Intel386 Architecture Processor Supplement Fourth Edition. 
+Important aspects of this ABI are: 
+-- Intel byte order (little endian)
+-- sizeof(int) = 4
+-- sizeof(long) = 4
+-- downward growing stack with 4-byte alignment
+-- general purpose registers: EAX, EDX, ECX, EBX, EBP, ESI, EDI, ESP
+-- ESP is used as stack pointer
+-- EBP is used as frame pointer
+-- floating point registers: st(0) ... st(7)
+-- other context relevant flags: EFLAGS (flag register), floating point control
+-- parameter passing is purely stack based
+-- return addresses are stored on stack
+-- The direction flag must be cleared before entry to a function.
+
+__GET_AND_INC_SECTION_COUNTER().__GET_AND_INC_SUBSECTION_COUNTER().__GET_AND_INC_SUBSUBSECTION_COUNTER(). The context, stack and memory layout
+From ABI specification: The stack pointer holds the limit of the current stack
+frame, which is the address of the stack's bottom-most, valid word.
+
+So memory addresses below the value of esp which still belong to the 
+pre-allocated stack can be used for context saving. So if a thread is 
+interrupted by an external event like a timer interrupt the context of the 
+interrupted thread will be stored on the threads own stack below the last
+valid value of the threads stack. The same applies if the thread interrupts
+itself. Context saving involves the eight general purpose registers, the
+flag register, the instruction pointer and the floating point context. The
+memory layout ouf the stored context is describes in structure s_context. Pay 
+attention to the fact, that storing is done in reverse order. This means, that
+the instruction pointer is stored first (high address)  and the floating point 
+context last (low address). Restoring a context reverses the storing action.
+At first the floating point context will be restored, then the flags and the 
+general purpose registers and at last the instruction pointer.
+
+Loading a context is quite simple. Just use the function
+__asm_switch_to_context(long* context). This function expects a pointer
+to a context saved as described above. It then restores that context and 
+continues with execution at the saved instruction pointer.
+
+For context saving you have to differentiate between voluntary context switch
+and preemption. For voluntary context switching you have to use the function
+__asm_save_context_and_call_scheduler. It prepares for the return to this call,
+stores the context on the stack and calls the scheduler wrapper function. 
+For asynchronous contex switches (preemption) the function __asm_save_context 
+should be used. This function expects the value of the instruction pointer of 
+the interrupted thread in the global variable __interruptedInstructionPointer__.
+It prepares for continuation at this value, stores the context on the stack and
+calls the scheduler wrapper function.
+
+The scheduler has its own stack. The scheduler envinronment has to be prepared
+before the scheduler gets called. The scheduler wrapper functions expect a 
+pointer to the saved context as parameter. This pointer is saved in the 
+interrupted thread's instance variable "context". Then follows a call to the
+scheduler.
+
+The last thing to mention is the function init_context. This function expects
+two parameters. The first parameter is a pointer to a piece of memory to be used
+as stack by the thread the context is for. (The pointer points to top of stack.)
+The second parameter is a pointer to the thread object. The function returns a 
+pointer to the created context.
+
+__GET_AND_INC_SECTION_COUNTER(). About the scheduler
+The scheduler is priority based. From all runnable threads the one with the
+highest priority is choosen to run next. If two runnable threads have the same
+priority the one waiting longer since last activation is choosen.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

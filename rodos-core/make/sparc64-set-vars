@@ -1,0 +1,68 @@
+#! /bin/bash
+
+# written by Andre Bartke <dev@bartke.cc>
+# Adapted from linux/leon2/ocn versions.
+
+# Include this with the source command
+
+export ARCH="sparc64"
+export CROSS_PREFIX="sparc64-unknown-elf"
+
+# This corresponds to the cross toolchain build script
+export PATH="/opt/cross-$CROSS_PREFIX/$CROSS_PREFIX/bin:$PATH"
+export PATH="/usr/lib/cross-$CROSS_PREFIX/$CROSS_PREFIX/bin:$PATH"
+
+## Directory structure:
+export RODOS_SRC1="${RODOS_ROOT}/src/independent"
+export RODOS_SRC2="${RODOS_ROOT}/src/bare-metal-generic"
+export RODOS_ARCH_SRC="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+export RODOS_ARCH_DST="${RODOS_LIBS}/${ARCH}"
+
+## Compiler settings: See the sparc64/tools directory for a cross compiler
+TEST=`which gcc|grep $ARCH`
+
+if [ "$TEST" == "" ]; then
+  echo "Cross Compiler not found, aborting..."
+  exit
+fi
+
+# just use the out-of-path symlinks
+export CC=gcc
+export CXX=g++
+export AS=as
+export AR=ar
+export RANLIB=ranlib
+export MKISOFS=`which mkisofs`
+
+GCC_BASE_DIR=`dirname ${CC}`
+PATH="${GCC_BASE_DIR}:${PATH}"
+
+# compiler flags
+export CWARNINGS=" -Wall -Wextra" # -Werror"
+export CXXWARNINGS="" # ${CWARNINGS} -Weffc++"
+
+# -msoft-quad-float  use ABI functions instead of trap handlers
+# -mno-app-regs    force SVR4 ABI compliance, gcc won't use %g2-%g4
+export CFLAGS=" -g -nostdlib -fno-builtin -ffreestanding"
+export CFLAGS+=" -O0 -mcpu=ultrasparc -m64 -mno-app-regs -pipe"
+export CFLAGS+=" -D__USE_GLOBAL_CXXABI__" # use the new environment
+export CFLAGS+=" -D__USE_GLOBAL_CRT__" # use the new environment
+
+export CXXFLAGS=" ${CFLAGS}" # -fdump-class-hierarchy"
+export CXXFLAGS+=" -nostartfiles -nostdinc++ -fno-rtti -fno-exceptions -fuse-cxa-atexit"
+export CXXFLAGS+=" ${CXXWARNINGS}"
+
+# we will gather all .c, .cpp and .S files from these directories.
+export INCLUDES=" \
+  -I${RODOS_ARCH_SRC} \
+  -I${RODOS_ARCH_SRC}/include \
+  -I${RODOS_SRC1} \
+  -I${RODOS_SRC2} \
+  -I${RODOS_API}  \
+  -I${RODOS_SUPPORT_LIBS} \
+  ${APP_INCLUDES} "
+
+#export CXX_LINKER_FLAGS=" -Wl,--no-check-sections,-Map,linker.map,-N,-T ${RODOS_ARCH_SRC}/_link.ld"
+export CXX_LINKER_FLAGS=" -Wl,--no-check-sections,-N,-T ${RODOS_ARCH_SRC}/_link.ld"
+export CXX_LINKER_FLAGS+=" -L ${RODOS_LIBS}/${ARCH} -lrodos -lgcc"
+

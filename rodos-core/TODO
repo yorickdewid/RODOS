@@ -1,0 +1,37 @@
+LinkinterfaceUDP 
+   hat     Fifo<NetworkMessage, 1500> incoming;
+ für embedded zu viel. es soll z.B. 4 sein. aber dann für linux zu wenig!
+lösung in configs?
+----
+
+rodos-core/make/stm32f4-set-vars
+wenn man 
+ARCH=stm32f4
+SUB_ARCH=stm32f429 # STM32F429Discovery
+#SUB_ARCH=stm32f40x  # STM32F4Discovery, MINI-M4
+
+
+
+-----------------
+
+long getNodeNumber -> int32_t getNodeNumber()
+extern long myNodeNr;  (-1 ist undef)
+long getNodeNumber() ....
+
+middlewaer_distributed -> middleware-distributed
+
+beauftragt:---------
+
+Class GenericMsgRef Eliminieren
+
+gatewas interface ohne rodos 
+	-> networkmessage, linkinterface & hal müssn von rest unabhägngig sein
+
+getNumberOfReceivedMsgsFromNetwork() soll zählen
+
+
+------------------
+
+dokumentation für VIDANA & VIDANA format
+
+

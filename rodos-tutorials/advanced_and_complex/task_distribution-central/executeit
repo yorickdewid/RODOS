@@ -1,0 +1,16 @@
+#   !/usr/bin/sh
+
+linux-executable gateway.cpp globals.cpp taskmanager.cpp usertask_evencnt.cpp usertask_negcnt.cpp usertask_oddcnt.cpp usertask_primcnt.cpp
+mv tst tst_usernode
+
+linux-executable gateway.cpp globals.cpp taskdistributor.cpp 
+mv tst tst_masternode
+
+xterm -bg white  -fg black -title usernode -e tst_usernode &
+xterm -bg white  -fg black -title usernode -e tst_usernode &
+xterm -bg white  -fg black -title usernode -e tst_usernode &
+
+sleep 1
+xterm -bg yellow  -fg black -title masternode -e tst_masternode &
+
+

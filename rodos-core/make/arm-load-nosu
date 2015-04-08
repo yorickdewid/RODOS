@@ -1,0 +1,31 @@
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/arm-set-vars
+
+echo "please press reset before loading"
+echo "Enter port, lpc2468-board is connected to (e.g. ttyUSB0, ttyUSB1, ...):"
+read INTERFACE
+
+chmod 0666 /dev/${INTERFACE}
+
+if [ -z $1 ]; then
+elfFile="lpc2468.elf"
+else
+elfFile=$1
+fi
+
+echo loading ${elfFile}
+
+${ARM_TOOLS}/arm-none-eabi-objcopy -O ihex ${elfFile} lpc2468.hex -j ".text" -j ".startup" -j ".data" -j ".ctors"
+
+${ARM_TOOLS}/lpc21isp -hex lpc2468.hex /dev/${INTERFACE} 115200 12000
+#\rm img
+
+${ARM_TOOLS}/startfromflash ${INTERFACE}
+#${ARM_TOOLS}/printserialsusb0  /dev/${INTERFACE} 17
+
+
+
+

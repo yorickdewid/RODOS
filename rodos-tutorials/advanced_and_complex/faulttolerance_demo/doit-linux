@@ -1,0 +1,25 @@
+
+if [ -z $RODOS_ROOT ]; then
+	echo "go to rodos directory and call source make/rodosenv"
+	echo "else I can not do any thing!!!"
+else
+
+cd progs
+
+linux-executable checker.cpp topics.cpp gateway.cpp
+mv tst tst_checker
+
+linux-executable io_simple.cpp topics.cpp gateway.cpp
+mv tst tst_io_simple
+
+linux-executable topics.cpp steering.cpp gateway.cpp
+mv tst tst_steering
+
+linux-executable topics.cpp steering_faulty.cpp gateway.cpp
+mv tst tst_steering_faulty
+
+
+linux-executable  io_rodosguiinterface.cpp topics.cpp   gateway.cpp
+mv tst tst_io_rodosgui
+
+fi

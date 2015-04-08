@@ -1,0 +1,76 @@
+#!/bin/bash
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/stm32-set-vars
+
+TARGET=stm32
+FLASH_PROG=openocd
+FLASG_PROG_PATH=$ARM_TOOLS
+FLASH_PROG_COMMAND=$FLASH_PROG_PATH/$FLASH_PROG
+OBJCOPY=arm-none-eabi-objcopy
+OBJCOPY_PATH=$ARM_TOOLS
+OBJCOPY_COMMAND=$OBJCOPY_PATH/$OBJCOPY
+
+
+if [ -x $FLASH_PROG_COMMAND ]; then
+    echo "$FLASH_PROG: installed"
+else
+    # check whether programmer is installed in the default path
+    command -v $FLASH_PROG >/dev/null 2>&1 || { echo "$FLASH_PROG: NOT installed (try: sudo apt-get install $FLASH_PROG)" >&2; exit 1; }
+    FLASH_PROG_COMMAND="$(command -v $FLASH_PROG)"
+    echo "$FLASH_PROG: installed "
+fi
+
+if [ -x $OBJCOPY_COMMAND ]; then
+    echo "$OBJCOPY: installed"
+else
+    command -v $OBJCOPY >/dev/null 2>&1 || { echo "$OBJCOPY: NOT installed" >&2; exit 1; }
+    OBJCOPY_COMMAND="$(command -v $OBJCOPY)"
+    echo "$OBJCOPY: installed"
+fi
+
+
+if [ -f ./$TARGET.elf ]; then
+    echo "$TARGET.elf: OK"
+    #   rm *.hex &> /dev/null
+    $OBJCOPY_COMMAND -O ihex $TARGET.elf $TARGET.hex
+else
+    echo "$TARGET.elf: FAIL"
+    exit 1;
+fi
+
+
+if [ -f ./$TARGET.hex ]; then
+    echo "$TARGET.hex: OK"
+else
+    echo "$TARGET.hex: FAIL"
+    exit 1;
+fi
+
+echo ""
+
+if [ -f /etc/udev/rules.d/45-ftdi2232-libftdi.rules ]
+then
+	$FLASH_PROG -f ${MY_HW_SRCS}/$FLASH_PROG.cfg
+else
+	echo "superuser password needed to access JTAG-debugger"
+
+	# mount rule for ARM-USB-OCD
+	echo "SYSFS{idProduct}==\"0003\", SYSFS{idVendor}==\"15ba\", MODE=\"666\", GROUP=\"plugdev\"" > 45-ftdi2232-libftdi.rules
+
+	# mount rule for ARM-USB-OCD-H
+	echo "SYSFS{idProduct}==\"002b\", SYSFS{idVendor}==\"15ba\", MODE=\"666\", GROUP=\"plugdev\"" >> 45-ftdi2232-libftdi.rules
+
+	sudo mv 45-ftdi2232-libftdi.rules /etc/udev/rules.d/
+
+	sudo udevadm trigger 
+	sudo udevadm control --reload-rules
+
+	sleep 1s 
+
+	$FLASH_PROG -f ${MY_HW_SRCS}/$FLASH_PROG.cfg
+fi
+

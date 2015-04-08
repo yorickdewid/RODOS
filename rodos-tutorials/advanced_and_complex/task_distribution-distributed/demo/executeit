@@ -1,0 +1,20 @@
+#   !/usr/bin/sh
+
+linux-executable  controller* nodemanager.cpp  globals.cpp 
+mv tst tst_controller
+
+linux-executable   globals.cpp actuator.cpp
+mv tst tst_actuator
+
+
+xterm -bg white  -fg black -title usernode -e tst_controller &
+#sleep 2
+xterm -bg white  -fg black -title usernode -e tst_controller &
+#sleep 2
+xterm -bg white  -fg black -title usernode -e tst_controller &
+#sleep 2
+xterm -bg white  -fg black -title usernode -e tst_controller &
+
+sleep 1
+xterm -bg yellow  -fg black -title actuator -e tst_actuator &
+

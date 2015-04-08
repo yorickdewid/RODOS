@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# Author: Murat Goeksu <Murat.Goeksu@dlr.de>
+
+# Variables
+
+UART_DEVICE="/dev/ttyUSB0"
+STACK_POINTER="0x40ffffff"
+GRMON_UPLOAD_FILE="example"
+GRMON_BASH_SCRIPT="grmon_temp_bash"
+GRMON_TCL_SCRIPT="grmon_temp_tcl"
+
+# Generate GRMON scripts
+echo "set FILE ${GRMON_UPLOAD_FILE}" > ${GRMON_TCL_SCRIPT}
+echo "load \$FILE" >> ${GRMON_TCL_SCRIPT}
+echo "run" >> ${GRMON_TCL_SCRIPT}
+echo "source ${GRMON_TCL_SCRIPT}" > ${GRMON_BASH_SCRIPT}
+
+# Execute GRMON
+grmon -stack ${STACK_POINTER} -uart ${UART_DEVICE} -c ${GRMON_BASH_SCRIPT}
+
+# Clean
+rm ${GRMON_TCL_SCRIPT}
+rm ${GRMON_BASH_SCRIPT}

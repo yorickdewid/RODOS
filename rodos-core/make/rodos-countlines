@@ -1,0 +1,5 @@
+
+cd $RODOS_ROOT
+decomment api/* src/independent/* src/independent/gateway/* src/bare-metal-generic/* src/bare-metal/linux_x86/*   | wc 
+
+

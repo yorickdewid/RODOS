@@ -1,0 +1,30 @@
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/stm32-set-vars
+
+# - starting openocd without flashing the device
+# - openocd keeps running in terminal and provides a gdb-server for gdb
+
+if [ -f /etc/udev/rules.d/45-ftdi2232-libftdi.rules ]
+then
+	openocd -f ${MY_HW_SRCS}/openocd_debug.cfg
+else
+	echo "superuser password needed to access JTAG-debugger"
+
+	# mount rule for ARM-USB-OCD
+	echo "SYSFS{idProduct}==\"0003\", SYSFS{idVendor}==\"15ba\", MODE=\"666\", GROUP=\"plugdev\"" > 45-ftdi2232-libftdi.rules
+
+	# mount rule for ARM-USB-OCD-H
+	echo "SYSFS{idProduct}==\"002b\", SYSFS{idVendor}==\"15ba\", MODE=\"666\", GROUP=\"plugdev\"" >> 45-ftdi2232-libftdi.rules
+
+	sudo mv 45-ftdi2232-libftdi.rules /etc/udev/rules.d/
+
+	sudo udevadm trigger 
+	sudo udevadm control --reload-rules
+
+	sleep 1s
+
+	openocd -f ${MY_HW_SRCS}/openocd_debug.cfg
+fi

@@ -1,0 +1,11 @@
+#
+# Debugger type
+#
+source [find interface/olimex-arm-usb-ocd.cfg]
+jtag_khz 1000
+
+#
+# Target type
+#
+set WORKAREASIZE 0x1000
+source [find target/stm32.cfg]

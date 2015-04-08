@@ -1,0 +1,32 @@
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+for i in $*
+do
+    # a directories -> all *.cp in the directory
+    if test -d $i
+    then
+      echo "going directory" $i
+      cd $i
+      \rm -rf o
+      ${CPP_COMP}  ${CFLAGS} ${CPPFLAGS} ${INCLUDES}  -c *.cpp
+      mkdir o
+      mv *.o o
+      \rm -rf ${RODOS_TO_LINK}/$i
+      mv o ${RODOS_TO_LINK}/$i
+      cd ..
+    else
+    # a single file
+      \rm -f *.o
+      ${CPP_COMP}  ${CFLAGS} ${CPPFLAGS} ${INCLUDES}  -c $i
+      mv -i *.o ${RODOS_TO_LINK}/single_files/.
+    fi
+done
+
+
+
+
+
+

@@ -1,0 +1,38 @@
+#!/bin/bash
+# Check whether environment has been set
+if [ -z $RODOS_ROOT ]; then
+   # Environment is not set
+   source `dirname $0`/print_no_envs_warning
+fi  
+
+# Set variables to source and includ files, set compiler flags
+source ${RODOS_MAKES}/freertos-avr32-set-vars
+
+#Compile first FreeRTOS functionalities with C-compiler and move them to the libs-folder
+cd ${RODOS_LIBS}
+#echo "we are now in `pwd`"
+for FRTOS_SRC in ${LIB_SRCS}
+do
+    #echo $FRTOS_SRC
+    if ls ${FRTOS_SRC}/*.c  >& /dev/null ; then
+        ${C} ${CFLAGS} ${LIB_INCLUDES} ${FRTOS_SRC}/*.c -c
+    fi
+    
+    if ls ${FRTOS_SRC}/*.S  >& /dev/null ; then
+        ${C} ${CFLAGS} ${LIB_INCLUDES} ${FRTOS_SRC}/*.S -c
+    fi
+done
+
+${C} ${CFLAGS} ${LIB_INCLUDES} ${RODOS_ROOT}/src/on-freertos/FreeRTOS/Source/portable/MemMang/heap_3.c -c
+
+
+echo "Compilation of FreeRtos AVR32 finished."
+
+echo "Compile generic-lib..."
+
+# Link object files and move library to its libs-subfolder
+source ${RODOS_MAKES}/generic-lib
+
+cp "${RODOS_ROOT}/src/on-freertos/FreeRTOS/Demo/AVR32_UC3/NEWLIB_ADDONS/libnewlib_addons-at32ucr2-speed_opt.a" "${RODOS_LIBS}/${ARCH}/libnlao.a"
+
+source ${RODOS_MAKES}/check_rodos_support

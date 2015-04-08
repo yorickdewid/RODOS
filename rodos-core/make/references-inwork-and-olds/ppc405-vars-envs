@@ -1,0 +1,24 @@
+
+ARCH="ppc405_xupv2p"
+
+MY_SRCS="${RODOS_ROOT}/src/bare-metal-generic"
+MY_HW_SRCS="${RODOS_ROOT}/src/bare-metal/${ARCH}"
+
+
+
+
+#DIETLIBC="${HOME}/ppc-405/dietlibc-0.32"
+DIETLIBC="/opt/dietlibc-0.32"
+
+C_COMP="/opt/powerpc-405-linux-gnu/bin/powerpc-405-linux-gnu-gcc"
+CPP_COMP="/opt/powerpc-405-linux-gnu/bin/powerpc-405-linux-gnu-g++"
+
+CFLAGS="-pedantic -Wall -Wextra -Wno-unused-parameter -Wno-long-long -ffreestanding -nostdlib -static -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -O3"
+CPPFLAGS="-fno-rtti "
+
+INCLUDES="-nostdinc -I${RODOS_API} -I${MY_SRCS} -I${MY_HW_SRCS} -I${DIETLIBC}/include -I${RODOS_SUPPORT_LIBS} ${APP_INCLUDES}"
+
+LINKFLAGS="-Wl,--script=${MY_HW_SRCS}/linkerscript -L ${RODOS_LIBS}/${ARCH} ${APP_FLAGS} -lrodos  -lgcc -lm"
+
+FIRST_LINK_OBJ="${RODOS_LIBS}/${ARCH}/00globalobjects.o"
+

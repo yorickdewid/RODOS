@@ -1,0 +1,23 @@
+*** See support_programs/maskgen ****
+
+
+Node Nr [NN]        T0   T1   T2   T3   T4   T5   T6   T7   T8   T9   
+                   -------------------------------------------------
+Distribution Talbe [T0] [T1] [T2] [T3] [T4] [T5] [T6] [T7] [T8] [T9] 
+                   -------------------------------------------------
+
+TaskId  TaksNr : Context
+-------------------------
+
+negCnt   [NC]  : [NEG    ]
+oddcnt   [OC]  : [ODD    ]
+evenCnt  [EC]  : [EVEN   ]
+PrimCnt  [PC]  : [PRIM   ]
+-------  [I7]  : [C7     ]
+-------  [I8]  : [C8     ]
+-------  [I9]  : [C9     ]
+
+Sendig report:
+      node [NR] sane [S] cpudLoad [L]  timeNow [TIME     ]
+
+

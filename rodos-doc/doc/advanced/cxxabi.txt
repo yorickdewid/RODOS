@@ -1,0 +1,86 @@
+
+                                Itanium C++ ABI
+                          Andre Bartke <dev@bartke.cc>
+
+This document serves as an explanation to C++ ABI mentioned in the portin
+guide. None of the functions has to be provided by a port itself. Every
+bare-metal platform shall provide an atomic_cmpxchg and can relay on the
+global implementations of these ABI functions.
+
+An ABI defines all the low-level rules that are expected of executables to
+follow. Parameter passing, calling conventions and alignments may be some
+of the things that are specified by it. This becomes particularly important
+when it comes to dynamic linking or compilers itself.  Since GCC 3.0, g++
+follows the Itanium C++ ABI. Despite what the name suggests, it is compatible
+with many architectures. Required functions include:
+
+ extern "C" void *__dso_handle;
+ extern "C" void __cxa_pure_virtual();
+ extern "C" int __cxa_atexit(void (*func) (void *), void *arg, void *dso_handle);
+ extern "C" void __cxa_finalize(void *func); 
+
+The ABI dictates that every constructor has to register a destructor
+function with
+
+  __cxa_atexit()
+
+This behavior should be default, but can be enforced with the -fuse-cxa-atexit
+compiler option. The ABI further states that a list of termination functions
+has to be maintained which, upon exit, is processed in reverse order. It shall
+contain the termination function pointer, an optional function argument and
+a dynamic shared object handle named
+  __dso_handle
+
+The dso handle is a unique value that identifies the shared library of the
+entry, or in our case, the kernel. Upon termination of a program,
+
+  __cxa_finalize()
+
+is called with the address of a function as the parameter. It then calls
+the corresponding destructor and removes the object from the list. The ABI
+specifies that when the parameter is 0 (NULL), all termination functions in
+the list are called in the reverse order of their registration. This is the
+expected behavior when the kernel exits.
+
+It is also required to define the function
+
+  __cxa_pure_virtual()
+
+that terminates the program if a pure virtual function is called. A function
+is called a `pure virtual' if its vtable address is a NULL pointer. This
+should never happen since it is impossible to instantiate a class without
+defining all its virtual functions.
+
+The ABI further defines run-time support concerning local static
+variables. Global scope static objects have their own constructors that
+are part of the start-up code. For static locals the compiler acquires a
+guard to ensure the initialization code is executed by one thread only. This
+is necessary due to thread-safety. To support thread-safe initialization,
+we have to implement the three API functions:
+
+  extern "C" int __cxa_guard_acquire(__int64_t *g);
+  extern "C" void __cxa_guard_release(__int64_t *g);
+  extern "C" void __cxa_guard_abort(__int64_t *g);
+
+Alternatively, this behavior can be disabled by the compiler option
+-fno-threadsafe-statics, but this would violate the ABI.
+
+Before entering the initialization code, g++ adds in the
+
+  __cxa_guard_acquire()
+
+function. If the object in question is not instantiated its status is set
+from 'not initialized' to 'pending' using an atomic compare and swap and
+the function returns 1.  After the initialization code has run, a call to
+
+  __cxa_guard_release()
+
+is issued which sets the state to done. If a second thread also wants to
+initialize this resource, it can only encounter an initialization 'pending' -
+'done' state, upon which it returns 0. In case of a 'pending' initialization
+the thread is waiting for it to finish.
+
+
+References:
+[1] http://refspecs.linux-foundation.org/cxxabi-1.83.html
+

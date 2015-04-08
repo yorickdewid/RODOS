@@ -1,0 +1,35 @@
+Getting start :
+command line:
+build one directory for store the make file, example $RODOSROOT/build
+then
+$RODOSROOT/build$ cmake ../
+$RODOSROOT/build$ make
+The lib file should be in $RODOSROOT/libs
+
+more info at www.cmake.org
+
+NOTES:
+Changed source:
+Leon: Linkerscript. "INPUT(crt.o)" auskommentiert, da nicht kompatibel mit cmake, wenn in cmake nicht einige Einstellungen geändert werden. Außerdem wir es nicht unbedingt benötigt.
+PPC405: Linkerscript und _pitIsr.s geändert, da mit cmake nicht mehr wie vorher die .text-section der Datei _pitIsr.o genommen werden konnte. _pitIsr.s hat jetzt eine Section pitIsr, die das Linkerscript an die ursprüngliche Stelle schiebt.
+ARM Cortex: __dso_handle konnte beim Linken nicht gefunden werden. War in syscalls.cpp auskommentiert. Einkommentieren löste den Linkerfehler. Funktionieren nun die Programme noch?
+ARM v4: _startup kann beim Linken nicht gefunden werden. Ist aber auch bei den Skripten so.
+
+--- Variables:
+-- Defined in main cmake list file:
+PROJECT_ROOT_DIR: Directory of the root cmake list file == Rodos root dir
+PROJECT_NAME: "RODOS". Used for the project()-Commands and so on. Could be used otherwise.
+-- Must be defined in Toolchain file:
+SRC_DIR_LIST: List of directories containing sourcecode files for the rodos lib. All .cpp,.c and .s files (case insensitive) are selected to be included into the librodos.a.
+ARCH: Name of the architecture. At least used to specify the library output path.
+-- Can be defined in toolchain file (effects library and executables build with this cmake script):
+CMAKE_C_FLAGS: Flags to be passed to the C-Compiler
+CMAKE_CXX_FLAGS: Flags to be passed to the C++-Compiler
+CMAKE_FORCE_C_COMPILER (<compilerbinary name> gnu)
+CMAKE_FORCE_CXX_COMPILER (<compilerbinary name> gnu)
+ARCH_INCLUDE_DIRECTORIES: List of additional include directories besides the source directories
+APP_LIBRARIES: Libraries needed by the RODOS-Port
+-- Can be defined in toolchain file (effects only the executables build with this cmake script, so currently only the tutorial executables):
+LINKER_FLAGS: Flags to be passed to gcc when linking the executable
+
+The variable CMAKE_SYSTEM_NAME should be set to Generic if its not a Linux/Windows-Port

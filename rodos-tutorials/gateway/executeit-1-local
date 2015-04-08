@@ -1,0 +1,7 @@
+
+
+echo "no gateway, no distribution, all 3 tasks in the same node"
+
+linux-executable  demo_topics.cpp  sender.cpp receiver1.cpp  receiver2.cpp 
+tst
+

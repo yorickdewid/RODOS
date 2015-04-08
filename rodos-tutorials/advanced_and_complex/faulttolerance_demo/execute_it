@@ -1,0 +1,42 @@
+
+
+PROGS=`pwd`/progs
+
+echo "***********************************************************"
+echo "* edit this file to select which io you would like to use *"
+echo "***********************************************************"
+
+doit-linux
+
+echo "comment or comentout line to config see point 1,2"
+
+## 1) Select how much redundancy and faulty node
+
+xterm -bg yellow -fg black -title steering -e ${PROGS}/tst_steering &
+xterm -bg yellow -fg black -title steering -e ${PROGS}/tst_steering &
+xterm -bg yellow -fg black -title steering -e ${PROGS}/tst_steering &
+xterm -bg red    -fg black -title steering-Faulty -e ${PROGS}/tst_steering_faulty &
+
+xterm -bg orange -fg black -title checker  -e ${PROGS}/tst_checker &
+
+##### 2) Select one of these sensors gui or not gui ###########
+#IO=SIMPLE
+IO=RODOSGUI
+
+
+case $IO in
+    SIMPLE)
+        ${PROGS}/tst_io_simple 
+        ;;
+    RODOSGUI)
+        xterm -title gui-server -e  ${RODOS_SUPPORT_PROGS}/server-qt-freedrawing/tst &
+        sleep 1
+        ${PROGS}/tst_io_rodosgui
+        ;;
+
+esac
+
+
+
+
+

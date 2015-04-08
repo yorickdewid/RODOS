@@ -1,0 +1,10 @@
+
+export LIB="-lm -L/opt/X11R5/lib  -lXt -lXmu -lXext -lX11 -lpthread "
+export XINC=" -I/opt/X11R5/include -I/usr/include -I/usr/include/X11"
+
+
+export INCLUDES="${XINC}  -I../ -I../udpinterface"
+export EXTRA_SOURCES="../udpinterface/udp_common.cpp"
+
+g++ -g -o tst ${INCLUDES} ${EXTRA_SOURCES} *.cpp  ${LIB}
+

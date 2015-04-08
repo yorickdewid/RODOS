@@ -1,0 +1,11 @@
+#! /bin/bash 
+
+#set -euC
+
+# ( cd doc && doxygen Doxyfile.LEON2 )
+
+leon2-lib
+for FILE in ${RODOS_ROOT}/tutorials/{core,aitest}/*.cpp
+do
+    OUT=${FILE%.cpp}.img leon2-executable ${FILE}
+done

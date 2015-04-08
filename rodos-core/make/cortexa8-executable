@@ -1,0 +1,20 @@
+#! /bin/bash
+
+if [ -z $RODOS_ROOT ]; then
+source `dirname $0`/print_no_envs_warning
+fi  
+
+source ${RODOS_MAKES}/cortexa8-set-vars
+
+\rm -f *.d
+\rm -f *.o
+
+${CXX_COMP} ${CPU_FLAG} ${CXX_FLAGS} ${INCLUDES} -c $*
+${CXX_COMP}  -T${LINKER_SCRIPT} ${LINKER_OPTIONS} -L${LINKER_LIB_PATH} -o cortexa8.elf *.o ${LINKER_LIB_INC}
+#-T${LINKER_SCRIPT}
+#${CXX_COMP} ${HWCFLAGS} -o cortexa8.elf *.o ${LINKFLAGS} #-T${LINKER_SCRIPT}
+
+rm -f *.o
+
+${OBJDUMP} -d -r -h -s -S cortexa8.elf > cortexa8.lst
+${OBJCOPY} -O binary cortexa8.elf cortexa8.bin
